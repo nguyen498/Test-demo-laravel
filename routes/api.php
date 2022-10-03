@@ -16,3 +16,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', 'api\EmployeeController@login');
 Route::post('register', 'api\EmployeeController@register');
+
+Route::post('vehicle/create', 'api\VehicleController@create');
