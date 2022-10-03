@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Employee;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Employee;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -80,5 +80,18 @@ class EmployeeController extends Controller
             ],
             $this->successStatus
         );
+    }
+
+    public function logout(Request $request){
+        $request->user()->token()->revoke;
+        return response()->json([
+            'message' => 'logout success',
+        ]);
+    }
+
+    public function user(Request $request){
+        return response()->json([
+            $request->user()
+        ]);
     }
 }

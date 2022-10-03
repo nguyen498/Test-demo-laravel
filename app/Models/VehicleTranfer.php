@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -8,11 +8,11 @@ class VehicleTranfer extends Model
 {
     //
     public function employee (){
-        return $this->belongsTo('App\Employee', 'create_by', 'update_by');
+        return $this->belongsTo('App\Models\Employee', 'create_by', 'update_by');
     }
 
     public function vehicleDetailTransfer(){
-        return $this->hasOne('App\VehicleTranferDetail');
+        return $this->hasOne('App\Models\VehicleTranferDetail');
     }
 
     public function station(){

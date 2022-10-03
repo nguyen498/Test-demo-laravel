@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,11 +21,11 @@ class Vehicle extends Model
     //
     public function vehicleTranferDetails()
     {
-        return $this->hasMany('App\VehicleTranferDetail');
+        return $this->hasMany('App\Models\VehicleTranferDetail');
     }
 
     public function medias()
     {
-        return $this->morphMany('App\Media', 'mediaable');
+        return $this->morphMany('App\Models\Media', 'mediaable');
     }
 }

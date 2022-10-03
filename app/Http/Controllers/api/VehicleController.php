@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Repositories\VehicleRepository;
-use App\Vehicle;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+use App\Repositories\VehicleRepository;
+use Illuminate\Http\Request;
 
 class VehicleController extends Controller
 {
@@ -26,5 +22,27 @@ class VehicleController extends Controller
         return response()->json([
             'data' => $data
         ], 201);
+    }
+
+    public function update($id, Request $request){
+        $data = $this->vehicle->update($id, $request);
+        return response()->json([
+            'data' => $data
+        ], 201);
+    }
+
+    public function delete($id){
+        $this->vehicle->delete($id);
+        return response()->json([
+            'infor' => 'delete success'
+        ],200);
+    }
+
+    public function search($kw){
+        $vehicle = $this->vehicle->search($kw);
+        return $vehicle;
+//            response()->json([
+//            'data' => $vehicle
+//        ], 200);
     }
 }

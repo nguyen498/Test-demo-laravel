@@ -16,5 +16,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', 'api\EmployeeController@login');
 Route::post('register', 'api\EmployeeController@register');
+Route::get('logout', 'api\EmployeeController@logout');
+Route::get('user', 'api\EmployeeController@user');
 
 Route::post('vehicle/create', 'api\VehicleController@create');
+Route::put('vehicle/update/{id}', 'api\VehicleController@update');
+Route::delete('vehicle/delete/{id}', 'api\VehicleController@delete');
+Route::get('vehicle/search/kw={kw}', 'api\VehicleController@search');

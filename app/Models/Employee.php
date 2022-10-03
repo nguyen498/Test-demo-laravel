@@ -1,9 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 
@@ -23,6 +22,6 @@ class Employee extends Authenticatable
     ];
 
     public function transfers(){
-        $this->hasMany('App\VehicleTranfer');
+        $this->hasMany('App\Models\VehicleTranfer');
     }
 }
