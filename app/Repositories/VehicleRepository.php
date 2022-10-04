@@ -21,9 +21,8 @@ class VehicleRepository
         $vehicle->user_id = 1;
         $vehicle->save();
         if($file = $request->file('cover_media')){
-            $coverMedia = $request->cover_media->store('public/upload');
+           $request->cover_media->store('public/upload');
 
-            $media = new Media();
             $name = rand().'.'.$file->getClientOriginalName();
             $file->move(public_path().'upload', $name);
             $media = new Media();
