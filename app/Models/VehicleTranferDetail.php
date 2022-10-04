@@ -15,7 +15,7 @@ class VehicleTranferDetail extends Model
         return $this->belongsTo('App\Models\Vehicle', 'vehicle_id');
     }
 
-    public function vehicleStationDetail(){
+    public function vehicle_station_detail(){
         return $this->belongsTo('App\Models\VehicleStationDetail', 'vehicle_station_id');
     }
 }

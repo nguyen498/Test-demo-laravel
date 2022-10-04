@@ -19,7 +19,7 @@ class Vehicle extends Model
     ];
 
     //
-    public function vehicleTranferDetails()
+    public function vehicle_tranfer_details()
     {
         return $this->hasMany('App\Models\VehicleTranferDetail');
     }

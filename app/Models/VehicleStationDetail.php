@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class VehicleStationDetail extends Model
 {
     //
-    public function vehicleTranferDetails(){
+    public function vehicle_tranfer_details(){
         return $this->hasMany('App\Models\VehicleTranferDetail');
     }
 
-    public function vehicleStation(){
+    public function vehicle_station(){
         return $this->belongsTo('App\VehicleStaion','vehicle_station_id');
     }
 

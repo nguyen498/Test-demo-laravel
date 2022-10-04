@@ -11,7 +11,7 @@ class VehicleTranfer extends Model
         return $this->belongsTo('App\Models\Employee', 'create_by', 'update_by');
     }
 
-    public function vehicleDetailTransfer(){
+    public function vehicle_detail_transfer(){
         return $this->hasOne('App\Models\VehicleTranferDetail');
     }
 

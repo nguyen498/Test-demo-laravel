@@ -6,12 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class VehicleStation extends Model
 {
+    protected $fillable = [
+        'name',
+        'phone',
+        'type',
+        'status'
+    ];
     //
     public function transfers(){
         return $this->hasMany('App\Models\VehicleTranfer');
     }
 
-    public function vehicleStationDetails(){
+    public function vehicle_station_details(){
         return $this->hasMany('App\Models\VehicleStationDetail');
     }
 

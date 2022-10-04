@@ -18,7 +18,6 @@ class CreateVehicleStationsTable extends Migration
             $table->string('reference')->nullable();
             $table->string('name');
             $table->string('phone');
-            $table->integer('employee_id');
             $table->integer('type')->nullable();
             $table->integer('status')->nullable();
             $table->timestamps();

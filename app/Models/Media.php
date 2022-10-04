@@ -7,10 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Media extends Model
 {
     protected $fillable = [
-      'path',
+        'name',
+        'path',
+        'mediaable_id'
     ];
+
     //
-    public function mediaable(){
+    public function mediaable()
+    {
         return $this->morphTo();
     }
 }
