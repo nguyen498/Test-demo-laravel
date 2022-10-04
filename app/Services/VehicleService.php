@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Media;
 use App\Models\Vehicle;
 use App\Repositories\VehicleRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 class VehicleService
@@ -20,8 +22,10 @@ class VehicleService
             'name' => 'required',
             'vehicle_number' => 'required',
             'price' => 'required | numeric',
-            'cover_media' => 'required | mimes: jpg, png, jpeg',
-            'detail_media' => 'required | mimes: jpg, png, jpeg'
+//            'cover_media' => 'required | mimes: jpg, png, jpeg',
+//            'detail_media' => 'required | mimes: jpg, png, jpeg'
+//            'cover_media' => 'required | max:1 ',
+//            'detail_media' => 'required | max: 1'
         ]);
         if ($validate->fails()) {
             return response()->json(
@@ -30,8 +34,37 @@ class VehicleService
                 ], 401
             );
         }
+        $vehicle = $this->vehicleRepository->create($request->all());
+        $vehicle->use_period = Carbon::now()->addYears(1);
+        $vehicle->user_id = 1;
+        if ($file = $request->file('cover_media')) {
+            $request->cover_media->store(public_path() . '/upload');
 
-        return $this->vehicleRepository->create($request);
+            $name = rand() . '.' . $file->getClientOriginalName();
+            $file->move(public_path() . '/upload', $name);
+            $media = new Media();
+            $media->path = $name;
+            $media->type = 1;
+
+            $vehicle->medias()->save($media);
+        }
+        $media->mediaable()->save($vehicle);
+        $data = [];
+        if ($request->file('detail_media')) {
+            foreach ($request->file('detail_media') as $key => $file) {
+                $name = rand() . '.' . $file->getClientOriginalName();
+                $file->move(public_path() . '/upload', $name);
+                $media = new Media();
+                $media->path = $name;
+                $media->type = 2;
+                $media->save();
+                $vehicle->medias()->save($media);
+                $media->mediaable()->save($vehicle);
+                $data[$key] = $media;
+            }
+        }
+
+        return $this->vehicleRepository->create($request->all());
     }
 
     public function update($id, Request $request){
@@ -48,7 +81,7 @@ class VehicleService
             );
         }
 
-        return $this->vehicleRepository->update($id, $request);
+        return $this->vehicleRepository->update($id, $request->all());
     }
 
     public function delete($id){
@@ -57,31 +90,5 @@ class VehicleService
 
     public function search($kw){
         return $this->vehicleRepository->search($kw);
-    }
-
-    public function addCoverMedia($id, Request $request)
-    {
-        $medias = Vehicle::find($id)->medias()->where('type', '=', '1')->get();
-        if($medias->count() < 1){
-            return $this->vehicleRepository->addCoverMedia($id ,$request);
-        }
-        else {
-            return response()->json([
-               'error' => 'Media cover is only 1'
-            ]);
-        }
-    }
-
-    public function addDetailMedia($id, Request $request)
-    {
-        $medias = Vehicle::find($id)->medias()->where('mediaable_id', '=', '2')->get();
-        if($medias->count() < 5){
-            return $this->vehicleRepository->addDetailMedia($id ,$request);
-        }
-        else {
-            return response()->json([
-                'error' => 'Media detail dont more than 5'
-            ]);
-        }
     }
 }

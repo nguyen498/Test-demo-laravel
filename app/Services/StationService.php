@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Media;
 use App\Repositories\StationRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -28,8 +29,36 @@ class StationService
                 ], 401
             );
         }
+        $station = $this->stationRepository->create($request->all());
+        if($file = $request->file('cover_media')){
+            $request->cover_media->store('public/upload');
 
-        return $this->stationRepository->create($request);
+            $name = rand().'.'.$file->getClientOriginalName();
+            $file->move(public_path().'upload', $name);
+            $media = new Media();
+            $media->path = $name;
+            $media->type = 1;
+
+            $station->medias()->save($media);
+        }
+
+        $media->mediaable()->save($station);
+        $data = [];
+        if($request->file('detail_media')){
+            foreach ($request->file('detail_media') as $key=>$file){
+                $name = rand().'.'.$file->getClientOriginalName();
+                $file->move(public_path().'upload', $name);
+                $media = new Media();
+                $media->path = $name;
+                $media->type = 2;
+                $media->save();
+                $station->medias()->save($media);
+                $media->mediaable()->save($station);
+                $data[$key] = $media;
+            }
+        }
+
+        return $this->stationRepository->create($request->all());
     }
 
     public function  update($id, Request $request){
@@ -46,7 +75,9 @@ class StationService
                 ], 401
             );
         }
-        return $this->stationRepository->update($id, $request);
+
+
+        return $this->stationRepository->update($id, $request->all());
     }
 
     public function delete($id){
