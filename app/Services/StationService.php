@@ -49,11 +49,11 @@ class StationService
         return $this->stationRepository->update($id, $request);
     }
 
-    public function delete(){
-
+    public function delete($id){
+        return $this->stationRepository->delete($id);
     }
 
-    public function search(){
-
+    public function search($kw){
+        return $this->stationRepository->search($kw);
     }
 }

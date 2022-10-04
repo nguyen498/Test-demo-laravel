@@ -47,15 +47,18 @@ class StationRepository
         $station = VehicleStation::findOrFail($id);
         $station->update([
             $station->name = $request->input('name'),
-            $station->phonge = $request->input('phone'),
+            $station->phone = $request->input('phone'),
         ]);
+        return $station;
     }
 
-    public function delete(){
-
+    public function delete($id){
+        $station = VehicleStation::findOrFail($id);
+        return $station->delete();
     }
 
-    public function search(){
-
+    public function search($kw){
+        $station = VehicleStation::where('name', 'like', '%'.$kw.'%')->paginate(2);
+        return $station;
     }
 }

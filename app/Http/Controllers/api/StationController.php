@@ -18,18 +18,27 @@ class StationController extends Controller
         $data = $this->stationServices->create($request);
         return response()->json([
             'data' => $data,
-        ], 201);
+        ]);
     }
 
-    public function  update(){
-
+    public function  update($id, Request $request){
+        $data = $this->stationServices->update($id, $request);
+        return response()->json([
+            'data' => $data,
+        ] );
     }
 
-    public function delete(){
-
+    public function delete($id){
+        $this->stationServices->delete($id);
+        return response()->json([
+            'message' => 'delete success'
+        ]);
     }
 
-    public function search(){
-
+    public function search($kw){
+        $station = $this->stationServices->search($kw);
+        return response()->json([
+            'data' => $station
+        ]);
     }
 }

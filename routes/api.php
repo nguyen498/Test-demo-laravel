@@ -21,11 +21,14 @@ Route::post('register', 'api\EmployeeController@register');
 //    Route::get('user', 'api\EmployeeController@user');
 //});
 
-/*=== api/vehicle */
+/*=== api/vehicle ===*/
 Route::post('vehicle/create', 'api\VehicleController@create');
 Route::put('vehicle/update/{id}', 'api\VehicleController@update');
 Route::delete('vehicle/delete/{id}', 'api\VehicleController@delete');
 Route::get('vehicle/search/kw={kw}', 'api\VehicleController@search');
 
-/*=== api/station */
+/*=== api/station ===*/
 Route::post('station/create', 'api\StationController@create');
+Route::put('station/update/{id}', 'api\StationController@update');
+Route::delete('station/delete/{id}', 'api\StationController@delete');
+Route::get('station/search/kw={kw}', 'api\StationController@search');
