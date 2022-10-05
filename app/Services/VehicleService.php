@@ -24,8 +24,6 @@ class VehicleService
             'price' => 'required | numeric',
 //            'cover_media' => 'required | mimes: jpg, png, jpeg',
 //            'detail_media' => 'required | mimes: jpg, png, jpeg'
-//            'cover_media' => 'required | max:1 ',
-//            'detail_media' => 'required | max: 1'
         ]);
         if ($validate->fails()) {
             return response()->json(
@@ -38,6 +36,13 @@ class VehicleService
         $vehicle->use_period = Carbon::now()->addYears(1);
         $vehicle->user_id = 1;
         if ($file = $request->file('cover_media')) {
+            if(count(array($request->cover_media)) > 1){
+                return response()->json(
+                    [
+                        'message' => 'Cover media only one',
+                    ]
+                );
+            }
             $request->cover_media->store(public_path() . '/upload');
 
             $name = rand() . '.' . $file->getClientOriginalName();
@@ -51,6 +56,13 @@ class VehicleService
         $media->mediaable()->save($vehicle);
         $data = [];
         if ($request->file('detail_media')) {
+            if(count(array_filter($request->detail_media)) > 5){
+                return response()->json(
+                    [
+                        'message' => 'Detail media dont more than 5',
+                    ]
+                );
+            }
             foreach ($request->file('detail_media') as $key => $file) {
                 $name = rand() . '.' . $file->getClientOriginalName();
                 $file->move(public_path() . '/upload', $name);
@@ -64,7 +76,7 @@ class VehicleService
             }
         }
 
-        return $this->vehicleRepository->create($request->all());
+        return $vehicle ;
     }
 
     public function update($id, Request $request){

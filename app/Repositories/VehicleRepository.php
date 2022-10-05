@@ -12,7 +12,6 @@ class VehicleRepository
     public function create(array $inputs)
     {
         $vehicle = Vehicle::create($inputs);
-        $vehicle->save();
         return $vehicle;
     }
 

@@ -21,6 +21,13 @@ class Employee extends Authenticatable
         'password', 'remember_token',
     ];
 
+    protected $casts = [
+        'name' => 'string',
+        'login_name' => 'string',
+        'password' => 'string',
+        'email' => 'string',
+    ];
+
     public function transfers(){
         $this->hasMany('App\Models\VehicleTranfer');
     }

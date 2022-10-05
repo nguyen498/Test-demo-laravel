@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\VehicleRepository;
+use App\Http\Resources\VehicleResource;
+use App\Models\Vehicle;
 use App\Services\VehicleService;
 use Illuminate\Http\Request;
 
@@ -47,18 +48,9 @@ class VehicleController extends Controller
         ], 200);
     }
 
-    public function addCoverMedia($id, Request $request): \Illuminate\Http\JsonResponse
-    {
-        $result = $this->vehicle->addCoverMedia($id, $request);
-        return response()->json([
-           'data' => $result
-        ]);
-    }
-
-    public function addDetailMedia($id, Request $request){
-        $result = $this->vehicle->addDetailMedia($id, $request);
-        return response()->json([
-            'data' => $result
-        ]);
+    public function findId($id){
+        $data = Vehicle::findOrFail($id);
+//        $vehicle = VehicleResource::collection($data);
+        return new VehicleResource($data);
     }
 }

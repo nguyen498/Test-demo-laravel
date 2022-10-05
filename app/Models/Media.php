@@ -12,6 +12,12 @@ class Media extends Model
         'mediaable_id'
     ];
 
+    protected $casts = [
+        'name' => 'string',
+        'path' => 'string',
+        'mediaable_id' => 'integer'
+    ];
+
     //
     public function mediaable()
     {

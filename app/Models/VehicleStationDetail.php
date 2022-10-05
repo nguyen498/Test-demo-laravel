@@ -6,6 +6,31 @@ use Illuminate\Database\Eloquent\Model;
 
 class VehicleStationDetail extends Model
 {
+    protected $fillable = [
+        'vehicle_station_id',
+        'vehicle_id',
+        'code',
+        'floor',
+        'slot',
+        'area',
+        'gate',
+        'period',
+        'status',
+        'type',
+    ];
+
+    protected $casts = [
+        'vehicle_station_id' => 'integer',
+        'vehicle_id' => 'integer',
+        'code' => 'string',
+        'floor' => 'string',
+        'slot' => 'string',
+        'area' => 'string',
+        'gate' => 'string',
+        'period' => 'float',
+        'status' => 'integer',
+        'type' => 'integer',
+    ];
     //
     public function vehicle_tranfer_details(){
         return $this->hasMany('App\Models\VehicleTranferDetail');

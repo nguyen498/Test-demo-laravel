@@ -18,6 +18,17 @@ class Vehicle extends Model
         'status',
     ];
 
+    protected $casts = [
+        'user_id' => 'integer',
+        'name' => 'string',
+        'reference' => 'string',
+        'vehicle_number' => 'string',
+        'description' => 'string',
+        'use_period' => 'string',
+        'price' => 'float',
+        'status' => 'integer',
+    ];
+
     //
     public function vehicle_tranfer_details()
     {

@@ -19,8 +19,8 @@ class StationService
         $validate = Validator::make($request->all(), [
             'name' => 'required',
             'phone'=> 'required | numeric | digits:11',
-//            'cover_media' => 'required | mimes: jpg, png, jpeg',
-//            'detail_media' => 'required | mimes: jpg, png, jpeg'
+            'cover_media' => 'required | mimes: jpg, png, jpeg',
+            'detail_media' => 'required | mimes: jpg, png, jpeg'
         ]);
         if ($validate->fails()) {
             return response()->json(
@@ -31,6 +31,13 @@ class StationService
         }
         $station = $this->stationRepository->create($request->all());
         if($file = $request->file('cover_media')){
+            if(count(array_filter($request->cover_media)) > 1){
+                return response()->json(
+                    [
+                        'message' => 'Cover media only one',
+                    ]
+                );
+            }
             $request->cover_media->store('public/upload');
 
             $name = rand().'.'.$file->getClientOriginalName();
@@ -45,6 +52,13 @@ class StationService
         $media->mediaable()->save($station);
         $data = [];
         if($request->file('detail_media')){
+            if(count(array_filter($request->detail_media)) > 5){
+                return response()->json(
+                    [
+                        'message' => 'Detail media dont more than 5',
+                    ]
+                );
+            }
             foreach ($request->file('detail_media') as $key=>$file){
                 $name = rand().'.'.$file->getClientOriginalName();
                 $file->move(public_path().'upload', $name);

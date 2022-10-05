@@ -12,6 +12,13 @@ class VehicleStation extends Model
         'type',
         'status'
     ];
+
+    protected $casts = [
+        'name' => 'string',
+        'phone' => 'string',
+        'type' => 'integer',
+        'status' => 'integer'
+    ];
     //
     public function transfers(){
         return $this->hasMany('App\Models\VehicleTranfer');

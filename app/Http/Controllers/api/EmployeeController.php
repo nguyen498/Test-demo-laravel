@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AuthRequest;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -49,25 +50,24 @@ class EmployeeController extends Controller
      *
      * @return\Illuminate\Http\Response
      */
-    public function register(Request $request)
+    public function register(AuthRequest $request)
     {
-        $validator = Validator::make($request->all(),
-            [
-                'name' => 'required',
-                'login_name' => 'required',
-                'email' => 'required|email',
-                'password' => 'required',
-                'c_password' => 'required|same:password',
-            ]
-        );
-
-        if ($validator->fails()) {
-            return response()->json(
-                [
-                    'error' => $validator->errors()
-                ], 401);
-        }
-
+//        $validator = Validator::make($request->all(),
+//            [
+//                'name' => 'required',
+//                'login_name' => 'required',
+//                'email' => 'required|email',
+//                'password' => 'required',
+//                'c_password' => 'required|same:password',
+//            ]
+//        );
+//
+//        if ($validator->fails()) {
+//            return response()->json(
+//                [
+//                    'error' => $validator->errors()
+//                ], 401);
+//        }
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $user = Employee::create($input);
