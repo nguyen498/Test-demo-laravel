@@ -39,4 +39,10 @@ class Vehicle extends Model
     {
         return $this->morphMany('App\Models\Media', 'mediaable');
     }
+
+    public function cover()
+    {
+        return $this->morphMany('App\Models\Media', 'mediaable')->where('type', 1);
+    }
 }
+

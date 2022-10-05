@@ -9,6 +9,7 @@ use App\Repositories\VehicleRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\File;
 
 class VehicleService
 {
@@ -100,11 +101,27 @@ class VehicleService
             );
         }
         $vehicle = Vehicle::find($id);
-        if($request->cover_media) {
-            $inputs['cover_media'] = $request->cover_media->store(public_path() . '/upload');
-            $vehicle->medias = $inputs['cover_media'];
-            $vehicle->medias()->save($vehicle->medias);
+        if ($file = $request->file('cover_media')) {
+            $media = $vehicle->medias()->where('type', '=', 1)->get();
+            $vehicle->medias()->update([
+                'mediaable_id' => null
+            ]);
+
+            if(File::exists(public_path().'/upload/'.$media)) {
+                File::delete(public_path().'/upload/'.$media);
+            }
+
+            $request->cover_media->store(public_path() . '/upload');
+
+            $name = rand() . '.' . $file->getClientOriginalName();
+            $file->move(public_path() . '/upload', $name);
+
+            $media = $this->mediaRepository->create($name);
+            $vehicle->medias()->save($media);
         }
+//        if ($request->file('detail_media')) {
+//
+//        }
         return $this->vehicleRepository->update($id, $request->all());
     }
 

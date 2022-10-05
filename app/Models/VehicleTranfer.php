@@ -6,6 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class VehicleTranfer extends Model
 {
+    protected $fillable = [
+        'reference',
+        'from_vehicle_station_id',
+        'to_vehicle_station_id',
+        'type',
+        'status',
+    ];
+
+    protected $casts = [
+        'reference' => 'string',
+        'from_vehicle_station_id' => 'integer',
+        'to_vehicle_station_id' => 'integer',
+        'type' => 'integer',
+        'status' => 'integer',
+    ];
     //
     public function employee (){
         return $this->belongsTo('App\Models\Employee', 'create_by', 'update_by');

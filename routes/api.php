@@ -24,7 +24,7 @@ Route::post('register', 'api\EmployeeController@register');
 /*=== api/vehicle ===*/
 Route::group(['prefix' => 'vehicle'], function (){
     Route::post('/create', 'api\VehicleController@create');
-    Route::put('/update/{id}', 'api\VehicleController@update');
+    Route::post('/update/{id}', 'api\VehicleController@update');
     Route::delete('/delete/{id}', 'api\VehicleController@delete');
     Route::get('/search/kw={kw}', 'api\VehicleController@search');
     Route::get('/{id}', 'api\VehicleController@findId');
