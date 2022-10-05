@@ -9,7 +9,6 @@ class MediaRepository
     public function create ($input){
         $media = Media::create([
             'path' => $input,
-            'type' => 1
         ]);
         return $media;
     }

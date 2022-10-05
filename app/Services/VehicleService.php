@@ -117,10 +117,19 @@ class VehicleService
             $file->move(public_path() . '/upload', $name);
 
             $media = $this->mediaRepository->create($name);
+            $media->type = 1;
             $vehicle->medias()->save($media);
         }
 //        if ($request->file('detail_media')) {
+//            foreach ($request->file('detail_media') as $key => $file) {
+//                $request->cover_media->store(public_path() . '/upload');
 //
+//                $name = rand() . '.' . $file->getClientOriginalName();
+//                $file->move(public_path() . '/upload', $name);
+//
+//                $media = $this->mediaRepository->create($name);
+//                $vehicle->medias()->save($media);
+//            }
 //        }
         return $this->vehicleRepository->update($id, $request->all());
     }
