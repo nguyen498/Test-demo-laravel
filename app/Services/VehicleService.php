@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Media;
 use App\Models\Vehicle;
+use App\Repositories\MediaRepository;
 use App\Repositories\VehicleRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -12,9 +13,13 @@ use Illuminate\Support\Facades\Validator;
 class VehicleService
 {
     protected $vehicleRepository;
+    protected $mediaRepository;
 
-    public function __construct (VehicleRepository $vehicleRepository){
+    public function __construct (VehicleRepository $vehicleRepository,
+                                MediaRepository $mediaRepository)
+    {
         $this->vehicleRepository = $vehicleRepository;
+        $this->mediaRepository = $mediaRepository;
     }
 
     public function create(Request $request){

@@ -19,9 +19,11 @@ class CreateVehicleStationDetailsTable extends Migration
             $table->integer('vehicle_id');
             $table->string('code');
             $table->string('floor');
+            $table->string('slot');
             $table->string('area');
+            $table->string('gate');
             $table->string('period');
-            $table->integer('status');
+            $table->integer('status')->nullable();
             $table->integer('type')->nullable();
             $table->timestamps();
         });

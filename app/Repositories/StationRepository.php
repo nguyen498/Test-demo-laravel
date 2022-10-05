@@ -27,7 +27,7 @@ class StationRepository
     }
 
     public function search($kw){
-        $station = VehicleStation::where('name', 'like', '%'.$kw.'%')->paginate(2);
+        $station = VehicleStation::where('name', 'like', '%'.$kw.'%')->paginate(10);
         return $station;
     }
 }

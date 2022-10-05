@@ -42,9 +42,17 @@ Route::group(['prefix' => 'vehicle-station'], function (){
     Route::delete('/delete/{id}', 'api\StationController@delete');
     Route::get('/search/kw={kw}', 'api\StationController@search');
 });
-
-
 //Route::post('station/create', 'api\StationController@create');
 //Route::put('station/update/{id}', 'api\StationController@update');
 //Route::delete('station/delete/{id}', 'api\StationController@delete');
 //Route::get('station/search/kw={kw}', 'api\StationController@search');
+
+
+/*=== api/vehicle-station-detail ===*/
+Route::group(['prefix' => 'vehicle-station-detail'], function (){
+    Route::post('/create', 'api\StationDetailController@create');
+    Route::put('/update/{id}', 'api\StationDetailController@update');
+    Route::delete('/delete/{id}', 'api\StationDetailController@delete');
+    Route::get('/search/kw={kw}', 'api\StationDetailController@search');
+});
+

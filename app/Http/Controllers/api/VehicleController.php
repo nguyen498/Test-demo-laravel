@@ -21,16 +21,18 @@ class VehicleController extends Controller
 
     public function create(Request $request){
         $data = $this->vehicle->create($request);
-        return response()->json([
-            'data' => $data,
-        ], 201);
+        return new VehicleResource($data);
+//        return response()->json([
+//            'data' => $data,
+//        ], 201);
     }
 
     public function update($id, Request $request){
         $data = $this->vehicle->update($id, $request);
-        return response()->json([
-            'data' => $data
-        ], 201);
+        return new VehicleResource($data);
+//        return response()->json([
+//            'data' => $data
+//        ], 201);
     }
 
     public function delete($id){
@@ -42,10 +44,10 @@ class VehicleController extends Controller
 
     public function search($kw){
         $result = $this->vehicle->search($kw);
-        return
-            response()->json([
-            'data' => $result
-        ], 200);
+        return  VehicleResource::collection($result);
+//      return response()->json([
+//            'data' => $result
+//        ], 200);
     }
 
     public function findId($id){

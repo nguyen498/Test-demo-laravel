@@ -30,15 +30,25 @@ class StationDetailService
 
     }
 
-    public function update(){
-
+    public function update($id, Request $request){
+        $validate = Validator::make($request->all(), [
+            'vehicle_station_id'=> 'required ',
+        ]);
+        if ($validate->fails()) {
+            return response()->json(
+                [
+                    'error' => $validate->errors(),
+                ], 401
+            );
+        }
+        return $this->stationDetailRepository->update($id, $request->all());
     }
 
-    public function delete(){
-
+    public function delete($id){
+        return $this->stationDetailRepository->delete($id);
     }
 
-    public function search(){
-
+    public function search($kw){
+        return $this->stationDetailRepository->search($kw);
     }
 }

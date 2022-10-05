@@ -19,8 +19,8 @@ class StationService
         $validate = Validator::make($request->all(), [
             'name' => 'required',
             'phone'=> 'required | numeric | digits:11',
-            'cover_media' => 'required | mimes: jpg, png, jpeg',
-            'detail_media' => 'required | mimes: jpg, png, jpeg'
+//            'cover_media' => 'required | mimes: jpg, png, jpeg',
+//            'detail_media' => 'required | mimes: jpg, png, jpeg'
         ]);
         if ($validate->fails()) {
             return response()->json(
@@ -31,7 +31,7 @@ class StationService
         }
         $station = $this->stationRepository->create($request->all());
         if($file = $request->file('cover_media')){
-            if(count(array_filter($request->cover_media)) > 1){
+            if(count(array($request->cover_media)) > 1){
                 return response()->json(
                     [
                         'message' => 'Cover media only one',
@@ -72,7 +72,7 @@ class StationService
             }
         }
 
-        return $this->stationRepository->create($request->all());
+        return $station;
     }
 
     public function  update($id, Request $request){
@@ -89,8 +89,6 @@ class StationService
                 ], 401
             );
         }
-
-
         return $this->stationRepository->update($id, $request->all());
     }
 
