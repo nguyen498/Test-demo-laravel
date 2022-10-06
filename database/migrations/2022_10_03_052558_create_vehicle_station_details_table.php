@@ -16,7 +16,7 @@ class CreateVehicleStationDetailsTable extends Migration
         Schema::create('vehicle_station_details', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('vehicle_station_id');
-            $table->integer('vehicle_id');
+            $table->integer('vehicle_id')->nullable();
             $table->string('reference')->nullable();
             $table->string('code');
             $table->string('floor');

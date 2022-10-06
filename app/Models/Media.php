@@ -16,7 +16,7 @@ class Media extends Model
     protected $casts = [
         'name' => 'string',
         'path' => 'string',
-        'type'=> 'integer',
+        'type' => 'integer',
         'mediaable_id' => 'integer'
     ];
 

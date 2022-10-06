@@ -17,7 +17,7 @@ class CreateVehicleTranferDetailsTable extends Migration
             $table->increments('id');
             $table->integer('vehicle_tranfer_id');
             $table->integer('vehicle_station_detail_id');
-            $table->integer('vehicle_id');
+            $table->integer('vehicle_id')->nullable();
             $table->integer('type')->nullable();
             $table->integer('status');
             $table->timestamps();

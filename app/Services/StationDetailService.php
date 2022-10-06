@@ -16,7 +16,7 @@ class StationDetailService
     protected $mediaRepository;
 
     public function __construct(StationDetailRepository $stationDetailRepository,
-                                MediaRepository $mediaRepository)
+                                MediaRepository         $mediaRepository)
     {
         $this->stationDetailRepository = $stationDetailRepository;
         $this->mediaRepository = $mediaRepository;
@@ -72,7 +72,7 @@ class StationDetailService
         $media->mediaable()->save($stationDetail);
         $data = [];
         if ($request->file('detail_media')) {
-            if (count(array_filter($request->detail_media)) > 5) {
+            if (count(array($request->detail_media)) > 5) {
                 return response()->json(
                     [
                         'message' => 'Detail media dont more than 5',
@@ -178,8 +178,8 @@ class StationDetailService
         return $this->stationDetailRepository->delete($id);
     }
 
-    public function search($kw)
+    public function search(array $inputs)
     {
-        return $this->stationDetailRepository->search($kw);
+        return $this->stationDetailRepository->search($inputs);
     }
 }

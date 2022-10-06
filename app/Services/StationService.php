@@ -27,8 +27,8 @@ class StationService
         $validate = Validator::make($request->all(), [
             'name' => 'required',
             'phone' => 'required | numeric | digits:11',
-            'cover_media' => 'required | mimes:jpeg png jpg',
-            'detail_media' => 'required | mimes:jpeg png jpg'
+//            'cover_media' => 'required | mimes:jpeg png jpg',
+//            'detail_media' => 'required | mimes:jpeg png jpg'
         ]);
         if ($validate->fails()) {
             return response()->json(
@@ -185,8 +185,8 @@ class StationService
         return $this->stationRepository->delete($id);
     }
 
-    public function search($kw)
+    public function search(array $inputs)
     {
-        return $this->stationRepository->search($kw);
+        return $this->stationRepository->search($inputs);
     }
 }

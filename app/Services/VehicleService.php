@@ -29,8 +29,8 @@ class VehicleService
             'name' => 'required',
             'vehicle_number' => 'required',
             'price' => 'required | numeric',
-            'cover_media.*' => 'required | mimes: jpg, png, jpeg',
-            //'detail_media.*' => 'required | mimes: jpg, png, jpeg'
+            'cover_media' => 'required | mimes: jpg, png, jpeg',
+            'detail_media' => 'required | mimes: jpg, png, jpeg'
         ]);
         if ($validate->fails()) {
             return response()->json(
@@ -50,7 +50,7 @@ class VehicleService
                 );
             } else {
                 $vehicle = $this->vehicleRepository->create($request->all());
-                $vehicle->update([
+                $vehicle->vehicleRepository->update([
                     $vehicle->use_period = Carbon::now()->addYears(1),
                     $vehicle->user_id = 1,
                     $vehicle->reference = $request->input('reference'),
@@ -58,7 +58,7 @@ class VehicleService
             }
         } else {
             $vehicle = $this->vehicleRepository->create($request->all());
-            $vehicle->update([
+            $vehicle->vehicleRepository->update([
                 $vehicle->use_period = Carbon::now()->addYears(1),
                 $vehicle->user_id = 1,
                 $vehicle->reference = rand(),
@@ -69,7 +69,7 @@ class VehicleService
                 return response()->json(
                     [
                         'message' => 'Cover media only one',
-                    ]
+                    ], 401
                 );
             }
             $request->cover_media->store(public_path() . '/upload');
@@ -85,11 +85,11 @@ class VehicleService
         $media->mediaable()->save($vehicle);
         $data = [];
         if ($request->file('detail_media')) {
-            if (count(array_filter($request->detail_media)) > 5) {
+            if (count(array($request->detail_media)) > 5) {
                 return response()->json(
                     [
                         'message' => 'Detail media dont more than 5',
-                    ]
+                    ], 401
                 );
             }
             foreach ($request->file('detail_media') as $key => $file) {
@@ -145,7 +145,7 @@ class VehicleService
                 return response()->json(
                     [
                         'message' => 'Cover media only one',
-                    ]
+                    ], 401
                 );
             }
             $media = $vehicle->medias()->where('type', '=', 1)->get();
@@ -169,7 +169,7 @@ class VehicleService
                 return response()->json(
                     [
                         'message' => 'Detail media dont more than 5',
-                    ]
+                    ], 401
                 );
             }
             $data = [];
@@ -196,8 +196,8 @@ class VehicleService
         return $this->vehicleRepository->delete($id);
     }
 
-    public function search($kw)
+    public function search($inputs)
     {
-        return $this->vehicleRepository->search($kw);
+        return $this->vehicleRepository->search($inputs);
     }
 }

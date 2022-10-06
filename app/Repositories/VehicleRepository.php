@@ -28,9 +28,14 @@ class VehicleRepository
         return $vehicle->delete();
     }
 
-    public function search($kw)
+    public function search(array $inputs)
     {
-        $vehicle = Vehicle::where('name', 'like', '%'.$kw.'%')->paginate(10);
+        $query = Vehicle::offset(($inputs['page'] - 1) * $inputs['limit'])->limit($inputs['limit']);
+        if (!empty($inputs['kw'])) {
+            $query->whereRaw('reference like \'%' . $inputs['kw'] . '%\'');
+            $query->whereRaw('name like \'%' . $inputs['kw'] . '%\'');
+        }
+        $vehicle = $query->orderBy($inputs['order_by'], $inputs['sort'])->get();
         return $vehicle;
     }
 }

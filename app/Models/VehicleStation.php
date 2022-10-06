@@ -21,16 +21,20 @@ class VehicleStation extends Model
         'status' => 'integer',
         'reference' => 'string'
     ];
+
     //
-    public function transfers(){
+    public function transfers()
+    {
         return $this->hasMany('App\Models\VehicleTranfer');
     }
 
-    public function vehicle_station_details(){
+    public function vehicle_station_details()
+    {
         return $this->hasMany('App\Models\VehicleStationDetail');
     }
 
-    public function medias(){
+    public function medias()
+    {
         return $this->morphMany('App\Models\Media', 'mediaable');
     }
 }

@@ -26,7 +26,7 @@ Route::group(['prefix' => 'vehicle'], function () {
     Route::post('/create', 'api\VehicleController@create');
     Route::post('/update/{id}', 'api\VehicleController@update');
     Route::delete('/delete/{id}', 'api\VehicleController@delete');
-    Route::get('/search/kw={kw}', 'api\VehicleController@search');
+    Route::post('/search', 'api\VehicleController@search');
     Route::get('/{id}', 'api\VehicleController@findId');
 });
 
@@ -36,7 +36,7 @@ Route::group(['prefix' => 'vehicle-station'], function () {
     Route::post('/create', 'api\StationController@create');
     Route::post('/update/{id}', 'api\StationController@update');
     Route::delete('/delete/{id}', 'api\StationController@delete');
-    Route::get('/search/kw={kw}', 'api\StationController@search');
+    Route::post('/search', 'api\StationController@search');
 });
 
 
@@ -45,6 +45,6 @@ Route::group(['prefix' => 'vehicle-station-detail'], function () {
     Route::post('/create', 'api\StationDetailController@create');
     Route::post('/update/{id}', 'api\StationDetailController@update');
     Route::delete('/delete/{id}', 'api\StationDetailController@delete');
-    Route::get('/search/kw={kw}', 'api\StationDetailController@search');
+    Route::post('/search', 'api\StationDetailController@search');
 });
 

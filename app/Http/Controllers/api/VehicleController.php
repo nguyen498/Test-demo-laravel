@@ -42,8 +42,8 @@ class VehicleController extends Controller
         ],200);
     }
 
-    public function search($kw){
-        $result = $this->vehicle->search($kw);
+    public function search(Request $request){
+        $result = $this->vehicle->search($request->all());
         return  VehicleResource::collection($result);
 //      return response()->json([
 //            'data' => $result

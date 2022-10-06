@@ -10,6 +10,7 @@ class Employee extends Authenticatable
 {
     //
     use Notifiable, hasApiTokens;
+
     protected $fillable = [
         'name',
         'login_name',
@@ -28,7 +29,8 @@ class Employee extends Authenticatable
         'email' => 'string',
     ];
 
-    public function transfers(){
+    public function transfers()
+    {
         $this->hasMany('App\Models\VehicleTranfer');
     }
 }

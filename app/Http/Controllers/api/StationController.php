@@ -44,9 +44,9 @@ class StationController extends Controller
             ]);
     }
 
-    public function search($kw)
+    public function search(Request $request)
     {
-        $station = $this->stationServices->search($kw);
+        $station = $this->stationServices->search($request->all());
         return VehicleStationResource::collection($station);
 //            response()->json([
 //            'data' => $station

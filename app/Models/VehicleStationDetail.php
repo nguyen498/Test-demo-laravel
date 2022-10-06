@@ -33,16 +33,20 @@ class VehicleStationDetail extends Model
         'type' => 'integer',
         'reference' => 'string'
     ];
+
     //
-    public function vehicle_tranfer_details(){
+    public function vehicle_tranfer_details()
+    {
         return $this->hasMany('App\Models\VehicleTranferDetail');
     }
 
-    public function vehicle_station(){
-        return $this->belongsTo('App\VehicleStaion','vehicle_station_id');
+    public function vehicle_station()
+    {
+        return $this->belongsTo('App\VehicleStaion', 'vehicle_station_id');
     }
 
-    public function medias(){
+    public function medias()
+    {
         return $this->morphMany('App\Models\Media', 'mediaable');
     }
 }

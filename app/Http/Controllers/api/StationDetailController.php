@@ -23,8 +23,8 @@ class StationDetailController extends Controller
         return
 //            new VehicleStationDetailResource($data);
             response()->json([
-           'data'=>$data
-        ]);
+                'data' => $data
+            ]);
     }
 
     public function update($id, Request $request)
@@ -33,8 +33,8 @@ class StationDetailController extends Controller
         return
 //            new VehicleStationDetailResource($data);
             response()->json([
-            'data'=>$data
-        ]);
+                'data' => $data
+            ]);
     }
 
     public function delete($id)
@@ -45,10 +45,10 @@ class StationDetailController extends Controller
         ]);
     }
 
-    public function search($kw)
+    public function search(Request $request)
     {
-        $station = $this->stationDetailService->search($kw);
-        return VehicleStationDetailResource::collection($station);
+        $stationDetails = $this->stationDetailService->search($request->all());
+        return VehicleStationDetailResource::collection($stationDetails);
 //            response()->json([
 //            'data' => $station
 //        ]);

@@ -8,26 +8,35 @@ use Illuminate\Http\Request;
 
 class StationRepository
 {
-    public function create(array $inputs){
+    public function create(array $inputs)
+    {
         $station = VehicleStation::create($inputs);
         $station->save();
 
         return $station;
     }
 
-    public function  update($id, array $inputs){
+    public function update($id, array $inputs)
+    {
         $station = VehicleStation::findOrFail($id);
         $station->update($inputs);
         return $station;
     }
 
-    public function delete($id){
+    public function delete($id)
+    {
         $station = VehicleStation::findOrFail($id);
         return $station->delete();
     }
 
-    public function search($kw){
-        $station = VehicleStation::where('name', 'like', '%'.$kw.'%')->paginate(10);
+    public function search(array $inputs)
+    {
+        $query = VehicleStation::offset($inputs['page'] - 1 * $inputs['limit'])->limit($inputs['limit']);
+        if (!empty($inputs['kw'])) {
+            $query->whereRaw('reference like \'%' . $inputs['kw'] . '%\'');
+            $query->whereRaw('name like \'%' . $inputs['kw'] . '%\'');
+        }
+        $station = $query->orderBy($inputs['order_by'], $inputs['sort'])->get();
         return $station;
     }
 }
