@@ -39,10 +39,12 @@ class StationRepository
         $station = $query->orderBy($inputs['order_by'], $inputs['sort'])->get();
         return $station;
     }
-    public function check($field, array $input){
+
+    public function check($field, array $input)
+    {
         $query = VehicleStation::where($field, $input[$field]);
-        if(!empty($inputs['id'])){
-            $query->where('id', '<>', $input['id']);
+        if (empty($inputs['id'])) {
+            $query->whereRaw('id' . ' <> ' . $input['id']);
         }
         $check = $query->first();
         return $check;

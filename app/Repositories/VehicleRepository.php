@@ -39,8 +39,12 @@ class VehicleRepository
         return $vehicle;
     }
 
-    public function check($field, $input){
-        $check = Vehicle::where($field, $input);
+    public function check($field, array $input){
+        $query = Vehicle::where($field, $input[$field]);
+        if(empty($inputs['id'])){
+            $query->where('id', '<>', $input['id']);
+        }
+        $check = $query->first();
         return $check;
     }
 }
