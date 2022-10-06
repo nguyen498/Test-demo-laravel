@@ -42,7 +42,7 @@ class VehicleService
 
         if (!empty($request->has('reference'))) {
 //            $check = Vehicle::where('reference', $request->input('reference'))->first();
-            $check = $this->vehicleRepository->check('reference', $request->input('reference'));
+            $check = $this->vehicleRepository->check('reference', [$request->input('reference')]);
             if ($check) {
                 return response()->json(
                     [
