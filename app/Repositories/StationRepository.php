@@ -49,4 +49,9 @@ class StationRepository
         $check = $query->first();
         return $check;
     }
+
+    public function findId($input){
+        $vehicle = VehicleStation::where('id', '=', $input);
+        return $vehicle;
+    }
 }

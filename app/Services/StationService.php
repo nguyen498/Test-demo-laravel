@@ -39,7 +39,7 @@ class StationService
         }
         if (!empty($request->has('reference'))) {
 //            $check = VehicleStation::where('reference', $request->input('reference'))->first();
-            $check = $this->stationRepository->check('reference', ['reference'=>$request->input('reference')]);
+            $check = $this->stationRepository->check('reference', ['reference' => $request->input('reference')]);
             if ($check) {
                 return response()->json(
                     [
@@ -62,7 +62,7 @@ class StationService
                     ]
                 );
             }
-            $request->cover_media->store(public_path().'/upload');
+            $request->cover_media->store(public_path() . '/upload');
 
             $name = rand() . '.' . $file->getClientOriginalName();
             $file->move(public_path() . '/upload', $name);
@@ -134,7 +134,7 @@ class StationService
             }
         }
 
-        $station = VehicleStation::find($id);
+        $station = $this->stationRepository->findId($id);
         if ($file = $request->file('cover_media')) {
             if (count(array($request->cover_media)) > 1) {
                 return response()->json(

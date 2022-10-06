@@ -148,7 +148,7 @@ class VehicleService
             }
         }
 
-        $vehicle = Vehicle::find($id);
+        $vehicle = $this->vehicleRepository->findId($id);
         if ($file = $request->file('cover_media')) {
             if (count(array($request->cover_media)) > 1) {
                 return response()->json(

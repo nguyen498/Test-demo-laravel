@@ -47,4 +47,9 @@ class VehicleRepository
         $check = $query->first();
         return $check;
     }
+
+    public function findId($input){
+        $vehicle = Vehicle::where('id', '=', $input);
+        return $vehicle;
+    }
 }
