@@ -7,9 +7,7 @@ use App\Models\Media;
 class MediaRepository
 {
     public function create ($input){
-        $media = Media::create([
-            'path' => $input,
-        ]);
+        $media = Media::create($input);
         return $media;
     }
 

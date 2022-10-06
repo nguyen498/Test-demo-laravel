@@ -35,6 +35,13 @@ class VehicleStation extends Model
 
     public function medias()
     {
-        return $this->morphMany('App\Models\Media', 'mediaable');
+        return $this->morphMany('App\Models\Media', 'mediaable')->where('type', '=', 1);
     }
+
+    public function detail_medias()
+    {
+        return $this->morphMany('App\Models\Media', 'mediaable')->where('type', '=', 2);
+    }
+
+
 }

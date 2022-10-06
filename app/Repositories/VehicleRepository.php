@@ -38,4 +38,9 @@ class VehicleRepository
         $vehicle = $query->orderBy($inputs['order_by'], $inputs['sort'])->get();
         return $vehicle;
     }
+
+    public function check($field, $input){
+        $check = Vehicle::where($field, $input);
+        return $check;
+    }
 }

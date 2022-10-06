@@ -38,11 +38,12 @@ class StationService
             );
         }
         if (!empty($request->has('reference'))) {
-            $check = VehicleStation::where('reference', $request->input('reference'))->first();
+//            $check = VehicleStation::where('reference', $request->input('reference'))->first();
+            $check = $this->stationRepository->check('reference', ['reference'=>$request->input('reference')]);
             if ($check) {
                 return response()->json(
                     [
-                        'message' => 'Reference is empty',
+                        'message' => 'Reference is duplicate',
                     ], 401
                 );
             } else {
@@ -65,9 +66,11 @@ class StationService
 
             $name = rand() . '.' . $file->getClientOriginalName();
             $file->move(public_path() . '/upload', $name);
-            $media = new Media();
-            $media->path = $name;
-            $media->type = 1;
+            $media = $this->mediaRepository->create([
+                'name' => $name,
+                'path' => '/upload/' . $name,
+                'type' => 2
+            ]);
 
             $station->medias()->save($media);
         }
@@ -75,7 +78,7 @@ class StationService
         $media->mediaable()->save($station);
         $data = [];
         if ($request->file('detail_media')) {
-            if (count(array_filter($request->detail_media)) > 5) {
+            if (count(array($request->detail_media)) > 5) {
                 return response()->json(
                     [
                         'message' => 'Detail media dont more than 5',
@@ -85,12 +88,12 @@ class StationService
             foreach ($request->file('detail_media') as $key => $file) {
                 $name = rand() . '.' . $file->getClientOriginalName();
                 $file->move(public_path() . '/upload', $name);
-                $media = new Media();
-                $media->path = $name;
-                $media->type = 2;
-                $media->save();
+                $media = $this->mediaRepository->create([
+                    'name' => $name,
+                    'path' => '/upload/' . $name,
+                    'type' => 2
+                ]);
                 $station->medias()->save($media);
-                $media->mediaable()->save($station);
                 $data[$key] = $media;
             }
         }
@@ -103,8 +106,8 @@ class StationService
         $validate = Validator::make($request->all(), [
             'name' => 'required',
             'phone' => 'required | numeric | digits:11',
-            'cover_media' => 'required | imgae | mimes: jpg, png, jpeg',
-            'detail_media' => 'required | image | mimes: jpg, png, jpeg'
+//            'cover_media' => 'required | image | mimes: jpg, png',
+//            'detail_media' => 'required | image | mimes: jpg, png'
         ]);
         if ($validate->fails()) {
             return response()->json(
@@ -113,12 +116,16 @@ class StationService
                 ], 401
             );
         }
-        if (!empty($request->has('reference'))) {
-            $check = VehicleStation::where('reference', $request->input('reference'))->first();
+        if (!empty($request->has('phone'))) {
+//            $check = VehicleStation::where('phone', $request->input('phone'))->where('id', '<>', $id)->first();
+            $check = $this->stationRepository->check('phone', [
+                'phone' => $request->input('phone'),
+                'id' => $request->input('id')
+            ]);
             if ($check) {
                 return response()->json(
                     [
-                        'message' => 'Reference is empty',
+                        'message' => 'Reference is duplicate',
                     ], 401
                 );
             } else {
@@ -136,7 +143,7 @@ class StationService
                     ]
                 );
             }
-            $media = $station->medias()->where('type', '=', 1)->get();
+            $media = $station->medias()->get();
             $station->medias()->delete();
 
             if (File::exists(public_path() . '/upload/' . $media)) {
@@ -148,12 +155,15 @@ class StationService
             $name = rand() . '.' . $file->getClientOriginalName();
             $file->move(public_path() . '/upload', $name);
 
-            $media = $this->mediaRepository->create($name);
-            $media->type = 1;
+            $media = $this->mediaRepository->create([
+                'name' => $name,
+                'path' => '/upload/' . $name,
+                'type' => 1
+            ]);
             $station->medias()->save($media);
         }
         if ($request->file('detail_media')) {
-            if (count(array_filter($request->detail_media)) > 5) {
+            if (count(array($request->detail_media)) > 5) {
                 return response()->json(
                     [
                         'message' => 'Detail media dont more than 5',
@@ -161,7 +171,7 @@ class StationService
                 );
             }
             $data = [];
-            $detailmedia = $station->medias()->where('type', '=', 2)->get();
+            $detailmedia = $station->detail_medias()->get();
             if (File::exists(public_path() . '/upload/' . $detailmedia)) {
                 File::delete(public_path() . '/upload/' . $detailmedia);
             }
@@ -170,8 +180,11 @@ class StationService
                 $name = rand() . '.' . $file->getClientOriginalName();
                 $file->move(public_path() . '/upload', $name);
 
-                $media = $this->mediaRepository->create($name);
-                $media->type = 2;
+                $media = $this->mediaRepository->create([
+                    'name' => $name,
+                    'path' => '/upload/' . $name,
+                    'type' => 2
+                ]);
                 $station->medias()->save($media);
                 $data[$key] = $media;
             }

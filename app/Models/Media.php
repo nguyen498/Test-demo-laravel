@@ -20,9 +20,19 @@ class Media extends Model
         'mediaable_id' => 'integer'
     ];
 
+    protected $hidden = [
+      'created_at',
+      'updated_at'
+    ];
+
     //
     public function mediaable()
     {
         return $this->morphTo();
+    }
+
+    public function getPathAttribute($value)
+    {
+        return url('/'). '/' .$value;
     }
 }

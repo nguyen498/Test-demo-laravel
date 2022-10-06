@@ -19,7 +19,8 @@ class VehicleStationResource extends JsonResource
             'name' => $this->name,
             'reference' => $this->reference,
             'phone' => $this->phone,
-            'medias' => $this->medias
+            'medias' => $this->medias,
+            'detai_medias' => $this->detail_medias
         ];
     }
 }

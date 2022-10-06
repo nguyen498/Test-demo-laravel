@@ -29,8 +29,8 @@ class VehicleService
             'name' => 'required',
             'vehicle_number' => 'required',
             'price' => 'required | numeric',
-            'cover_media' => 'required | mimes: jpg, png, jpeg',
-            'detail_media' => 'required | mimes: jpg, png, jpeg'
+//            'cover_media' => 'required | mimes: jpg, png, jpeg',
+//            'detail_media' => 'required | mimes: jpg, png, jpeg'
         ]);
         if ($validate->fails()) {
             return response()->json(
@@ -41,27 +41,28 @@ class VehicleService
         }
 
         if (!empty($request->has('reference'))) {
-            $check = Vehicle::where('reference', $request->input('reference'))->first();
+//            $check = Vehicle::where('reference', $request->input('reference'))->first();
+            $check = $this->vehicleRepository->check('reference', $request->input('reference'));
             if ($check) {
                 return response()->json(
                     [
-                        'message' => 'Reference is empty',
+                        'message' => 'Reference is duplicate',
                     ], 401
                 );
             } else {
                 $vehicle = $this->vehicleRepository->create($request->all());
-                $vehicle->vehicleRepository->update([
-                    $vehicle->use_period = Carbon::now()->addYears(1),
-                    $vehicle->user_id = 1,
-                    $vehicle->reference = $request->input('reference'),
+                $this->vehicleRepository->update($vehicle->id, [
+                    'use_period' => Carbon::now()->addYears(1),
+                    'user_id' => 1,
+                    'reference' => $request->input('reference'),
                 ]);
             }
         } else {
             $vehicle = $this->vehicleRepository->create($request->all());
-            $vehicle->vehicleRepository->update([
-                $vehicle->use_period = Carbon::now()->addYears(1),
-                $vehicle->user_id = 1,
-                $vehicle->reference = rand(),
+            $this->vehicleRepository->update($vehicle->id, [
+                'use_period' => Carbon::now()->addYears(1),
+                'user_id' => 1,
+                'reference' => rand(),
             ]);
         }
         if ($file = $request->file('cover_media')) {
@@ -76,9 +77,15 @@ class VehicleService
 
             $name = rand() . '.' . $file->getClientOriginalName();
             $file->move(public_path() . '/upload', $name);
-            $media = new Media();
-            $media->path = $name;
-            $media->type = 1;
+//            $media = new Media();
+//            $media->path = $name;
+//            $media->type = 1;
+
+            $media = $this->mediaRepository->create([
+                'name' => $name,
+                'path' => '/upload/'.$name,
+                'type' => 1
+            ]);
 
             $vehicle->medias()->save($media);
         }
@@ -95,10 +102,11 @@ class VehicleService
             foreach ($request->file('detail_media') as $key => $file) {
                 $name = rand() . '.' . $file->getClientOriginalName();
                 $file->move(public_path() . '/upload', $name);
-                $media = new Media();
-                $media->path = $name;
-                $media->type = 2;
-                $media->save();
+                $media = $this->mediaRepository->create([
+                    'name' => $name,
+                    'path' => '/upload/'.$name,
+                    'type' => 2
+                ]);
                 $vehicle->medias()->save($media);
                 $media->mediaable()->save($vehicle);
                 $data[$key] = $media;
@@ -124,11 +132,12 @@ class VehicleService
         }
 
         if (!empty($request->has('reference'))) {
-            $check = Vehicle::where('reference', $request->input('reference'))->first();
+//            $check = Vehicle::where('reference', $request->input('reference'))->first();
+            $check = $this->vehicleRepository->check('reference', $request->input('reference'))->where('id', '<>', $id);
             if ($check) {
                 return response()->json(
                     [
-                        'message' => 'Reference is empty',
+                        'message' => 'Reference is duplicate',
                     ], 401
                 );
             } else {
@@ -148,7 +157,7 @@ class VehicleService
                     ], 401
                 );
             }
-            $media = $vehicle->medias()->where('type', '=', 1)->get();
+            $media = $vehicle->medias()->get();
             $vehicle->medias()->delete();
 
             if (File::exists(public_path() . '/upload/' . $media)) {
@@ -160,8 +169,11 @@ class VehicleService
             $name = rand() . '.' . $file->getClientOriginalName();
             $file->move(public_path() . '/upload', $name);
 
-            $media = $this->mediaRepository->create($name);
-            $media->type = 1;
+            $media = $this->mediaRepository->create([
+                'name' => $name,
+                'path' => '/upload/' . $name,
+                'type' => 1
+            ]);
             $vehicle->medias()->save($media);
         }
         if ($request->file('detail_media')) {
@@ -182,8 +194,11 @@ class VehicleService
                 $name = rand() . '.' . $file->getClientOriginalName();
                 $file->move(public_path() . '/upload', $name);
 
-                $media = $this->mediaRepository->create($name);
-                $media->type = 2;
+                $media = $this->mediaRepository->create([
+                    'name' => $name,
+                    'path' => '/upload/' . $name,
+                    'type' => 2
+                ]);
                 $vehicle->medias()->save($media);
                 $data[$key] = $media;
             }
