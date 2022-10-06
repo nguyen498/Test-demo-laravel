@@ -17,7 +17,7 @@ class VehicleService
     protected $mediaRepository;
 
     public function __construct(VehicleRepository $vehicleRepository,
-                                MediaRepository   $mediaRepository)
+                                MediaRepository $mediaRepository)
     {
         $this->vehicleRepository = $vehicleRepository;
         $this->mediaRepository = $mediaRepository;

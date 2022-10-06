@@ -16,7 +16,7 @@ class StationDetailService
     protected $mediaRepository;
 
     public function __construct(StationDetailRepository $stationDetailRepository,
-                                MediaRepository         $mediaRepository)
+                                MediaRepository $mediaRepository)
     {
         $this->stationDetailRepository = $stationDetailRepository;
         $this->mediaRepository = $mediaRepository;
@@ -61,7 +61,7 @@ class StationDetailService
             $request->cover_media->store('public/upload');
 
             $name = rand() . '.' . $file->getClientOriginalName();
-            $file->move(public_path() . 'upload', $name);
+            $file->move(public_path() . '/upload', $name);
             $media = new Media();
             $media->path = $name;
             $media->type = 1;
@@ -81,7 +81,7 @@ class StationDetailService
             }
             foreach ($request->file('detail_media') as $key => $file) {
                 $name = rand() . '.' . $file->getClientOriginalName();
-                $file->move(public_path() . 'upload', $name);
+                $file->move(public_path() . '/upload', $name);
                 $media = new Media();
                 $media->path = $name;
                 $media->type = 2;

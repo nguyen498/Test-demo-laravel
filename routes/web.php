@@ -17,10 +17,3 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::get('/test', function (){
-    for($i = 0; $i< 100; $i++) {
-        echo "<br>";
-        echo "Test" . $i;
-    }
-});

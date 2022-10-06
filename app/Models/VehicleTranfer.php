@@ -12,6 +12,8 @@ class VehicleTranfer extends Model
         'to_vehicle_station_id',
         'type',
         'status',
+        'created_by',
+        'updated_by'
     ];
 
     protected $casts = [
@@ -20,6 +22,8 @@ class VehicleTranfer extends Model
         'to_vehicle_station_id' => 'integer',
         'type' => 'integer',
         'status' => 'integer',
+        'created_by' => 'integer',
+        'updated_by' => 'integer'
     ];
     //
     public function employee (){

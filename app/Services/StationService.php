@@ -27,8 +27,8 @@ class StationService
         $validate = Validator::make($request->all(), [
             'name' => 'required',
             'phone' => 'required | numeric | digits:11',
-//            'cover_media' => 'required | mimes: jpg, png, jpeg',
-//            'detail_media' => 'required | mimes: jpg, png, jpeg'
+            'cover_media' => 'required | mimes:jpeg png jpg',
+            'detail_media' => 'required | mimes:jpeg png jpg'
         ]);
         if ($validate->fails()) {
             return response()->json(
@@ -61,10 +61,10 @@ class StationService
                     ]
                 );
             }
-            $request->cover_media->store('public/upload');
+            $request->cover_media->store(public_path().'/upload');
 
             $name = rand() . '.' . $file->getClientOriginalName();
-            $file->move(public_path() . 'upload', $name);
+            $file->move(public_path() . '/upload', $name);
             $media = new Media();
             $media->path = $name;
             $media->type = 1;
@@ -84,7 +84,7 @@ class StationService
             }
             foreach ($request->file('detail_media') as $key => $file) {
                 $name = rand() . '.' . $file->getClientOriginalName();
-                $file->move(public_path() . 'upload', $name);
+                $file->move(public_path() . '/upload', $name);
                 $media = new Media();
                 $media->path = $name;
                 $media->type = 2;
@@ -103,8 +103,8 @@ class StationService
         $validate = Validator::make($request->all(), [
             'name' => 'required',
             'phone' => 'required | numeric | digits:11',
-//            'cover_media' => 'required | mimes: jpg, png, jpeg',
-//            'detail_media' => 'required | mimes: jpg, png, jpeg'
+            'cover_media' => 'required | imgae | mimes: jpg, png, jpeg',
+            'detail_media' => 'required | image | mimes: jpg, png, jpeg'
         ]);
         if ($validate->fails()) {
             return response()->json(

@@ -27,7 +27,7 @@ class VehicleTranferRepository
 
     public function search($kw)
     {
-        $result = VehicleTranfer::where('refrence', 'like', '%'.$kw.'%');
+        $result = VehicleTranfer::where('refrence', 'like', '%'.$kw.'%')->paginate(10);
         return $result;
     }
 }
