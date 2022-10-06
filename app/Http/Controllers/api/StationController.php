@@ -20,19 +20,19 @@ class StationController extends Controller
     public function create(Request $request)
     {
         $data = $this->stationServices->create($request);
-        return new VehicleStationResource($data);
-//            response()->json([
-//                'data' => $data,
-//            ]);
+//        return new VehicleStationResource($data);
+            return response()->json([
+                'data' => $data,
+            ]);
     }
 
     public function update($id, Request $request)
     {
         $data = $this->stationServices->update($id, $request);
-        return new VehicleStationResource($data);
-//            response()->json([
-//                'data' => $data,
-//            ]);
+//        return new VehicleStationResource($data);
+            return response()->json([
+                'data' => $data,
+            ]);
     }
 
     public function delete($id)

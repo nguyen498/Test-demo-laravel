@@ -20,20 +20,21 @@ class StationDetailController extends Controller
     public function create(Request $request)
     {
         $data = $this->stationDetailService->create($request);
-        return new VehicleStationDetailResource($data);
-//            response()->json([
-//           'data'=>$data
-//        ]);
+        return
+//            new VehicleStationDetailResource($data);
+            response()->json([
+           'data'=>$data
+        ]);
     }
 
     public function update($id, Request $request)
     {
         $data = $this->stationDetailService->update($id, $request);
         return
-            new VehicleStationDetailResource($data);
-//            response()->json([
-//            'data'=>$data
-//        ]);
+//            new VehicleStationDetailResource($data);
+            response()->json([
+            'data'=>$data
+        ]);
     }
 
     public function delete($id)

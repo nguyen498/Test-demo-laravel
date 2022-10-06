@@ -39,9 +39,31 @@ class VehicleService
                 ], 401
             );
         }
-        $vehicle = $this->vehicleRepository->create($request->all());
-        $vehicle->use_period = Carbon::now()->addYears(1);
-        $vehicle->user_id = 1;
+
+        if (!empty($request->has('reference'))) {
+            $check = Vehicle::where('reference', $request->input('reference'))->first();
+            if ($check) {
+                return response()->json(
+                    [
+                        'message' => 'Reference is empty',
+                    ], 401
+                );
+            } else {
+                $vehicle = $this->vehicleRepository->create($request->all());
+                $vehicle->update([
+                    $vehicle->use_period = Carbon::now()->addYears(1),
+                    $vehicle->user_id = 1,
+                    $vehicle->reference = $request->input('reference'),
+                ]);
+            }
+        } else {
+            $vehicle = $this->vehicleRepository->create($request->all());
+            $vehicle->update([
+                $vehicle->use_period = Carbon::now()->addYears(1),
+                $vehicle->user_id = 1,
+                $vehicle->reference = rand(),
+            ]);
+        }
         if ($file = $request->file('cover_media')) {
             if (count(array($request->cover_media)) > 1) {
                 return response()->json(
@@ -100,15 +122,37 @@ class VehicleService
                 ], 401
             );
         }
+
+        if (!empty($request->has('reference'))) {
+            $check = Vehicle::where('reference', $request->input('reference'))->first();
+            if ($check) {
+                return response()->json(
+                    [
+                        'message' => 'Reference is empty',
+                    ], 401
+                );
+            } else {
+                $vehicle = $this->vehicleRepository->update($id, $request->all());
+                $vehicle->use_period = Carbon::now()->addYears(1);
+                $vehicle->user_id = 1;
+                $vehicle->reference = $request->input('reference');
+            }
+        }
+
         $vehicle = Vehicle::find($id);
         if ($file = $request->file('cover_media')) {
+            if (count(array($request->cover_media)) > 1) {
+                return response()->json(
+                    [
+                        'message' => 'Cover media only one',
+                    ]
+                );
+            }
             $media = $vehicle->medias()->where('type', '=', 1)->get();
-            $vehicle->medias()->update([
-                'mediaable_id' => null
-            ]);
+            $vehicle->medias()->delete();
 
-            if(File::exists(public_path().'/upload/'.$media)) {
-                File::delete(public_path().'/upload/'.$media);
+            if (File::exists(public_path() . '/upload/' . $media)) {
+                File::delete(public_path() . '/upload/' . $media);
             }
 
             $request->cover_media->store(public_path() . '/upload');
@@ -120,18 +164,31 @@ class VehicleService
             $media->type = 1;
             $vehicle->medias()->save($media);
         }
-//        if ($request->file('detail_media')) {
-//            foreach ($request->file('detail_media') as $key => $file) {
-//                $request->cover_media->store(public_path() . '/upload');
-//
-//                $name = rand() . '.' . $file->getClientOriginalName();
-//                $file->move(public_path() . '/upload', $name);
-//
-//                $media = $this->mediaRepository->create($name);
-//                $vehicle->medias()->save($media);
-//            }
-//        }
-        return $this->vehicleRepository->update($id, $request->all());
+        if ($request->file('detail_media')) {
+            if (count(array_filter($request->detail_media)) > 5) {
+                return response()->json(
+                    [
+                        'message' => 'Detail media dont more than 5',
+                    ]
+                );
+            }
+            $data = [];
+            $detailmedia = $vehicle->medias()->where('type', '=', 2)->get();
+            if (File::exists(public_path() . '/upload/' . $detailmedia)) {
+                File::delete(public_path() . '/upload/' . $detailmedia);
+            }
+
+            foreach ($request->file('detail_media') as $key => $file) {
+                $name = rand() . '.' . $file->getClientOriginalName();
+                $file->move(public_path() . '/upload', $name);
+
+                $media = $this->mediaRepository->create($name);
+                $media->type = 2;
+                $vehicle->medias()->save($media);
+                $data[$key] = $media;
+            }
+        }
+        return $vehicle;
     }
 
     public function delete($id)

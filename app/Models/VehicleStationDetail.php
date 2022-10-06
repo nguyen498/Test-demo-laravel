@@ -17,6 +17,7 @@ class VehicleStationDetail extends Model
         'period',
         'status',
         'type',
+        'reference'
     ];
 
     protected $casts = [
@@ -30,6 +31,7 @@ class VehicleStationDetail extends Model
         'period' => 'float',
         'status' => 'integer',
         'type' => 'integer',
+        'reference' => 'string'
     ];
     //
     public function vehicle_tranfer_details(){

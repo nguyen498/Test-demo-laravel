@@ -30,7 +30,7 @@ class VehicleRepository
 
     public function search($kw)
     {
-        $vehicle = Vehicle::where('name', 'like', '%'.$kw.'%')->paginate(2);
+        $vehicle = Vehicle::where('name', 'like', '%'.$kw.'%')->paginate(10);
         return $vehicle;
     }
 }

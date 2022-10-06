@@ -17,6 +17,7 @@ class CreateVehicleStationDetailsTable extends Migration
             $table->increments('id');
             $table->integer('vehicle_station_id');
             $table->integer('vehicle_id');
+            $table->string('reference')->nullable();
             $table->string('code');
             $table->string('floor');
             $table->string('slot');

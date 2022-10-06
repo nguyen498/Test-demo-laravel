@@ -10,14 +10,16 @@ class VehicleStation extends Model
         'name',
         'phone',
         'type',
-        'status'
+        'status',
+        'reference'
     ];
 
     protected $casts = [
         'name' => 'string',
         'phone' => 'string',
         'type' => 'integer',
-        'status' => 'integer'
+        'status' => 'integer',
+        'reference' => 'string'
     ];
     //
     public function transfers(){
