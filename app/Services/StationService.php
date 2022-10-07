@@ -163,16 +163,6 @@ class StationService extends BaseService
         return $station;
     }
 
-    public function delete($id)
-    {
-        return $this->stationRepository->delete(VehicleStation::class, $id);
-    }
-
-    public function search(array $inputs)
-    {
-        return $this->stationRepository->search(VehicleStation::class, $inputs);
-    }
-
     public function checkInput($inputs)
     {
         $validate = Validator::make($inputs, [

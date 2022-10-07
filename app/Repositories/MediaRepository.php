@@ -6,7 +6,7 @@ use App\Models\Media;
 
 class MediaRepository
 {
-    public function create (array $input){
+    public function create ($input){
         $media = Media::create($input);
         return $media;
     }

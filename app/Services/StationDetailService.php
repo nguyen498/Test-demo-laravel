@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
-class StationDetailService
+class StationDetailService extends BaseService
 {
     protected $stationDetailRepository;
     protected $mediaRepository;
@@ -24,16 +24,11 @@ class StationDetailService
 
     public function create(Request $request)
     {
-        $validate = Validator::make($request->all(), [
-            'vehicle_station_id' => 'required ',
-        ]);
-        if ($validate->fails()) {
-            return response()->json(
-                [
-                    'error' => $validate->errors(),
-                ], 401
-            );
+        $checkInput = $this->checkInput($request->all());
+        if ($checkInput['is_fail']) {
+            return $checkInput;
         }
+
         if (!empty($request->has('reference'))) {
             $check = VehicleStationDetail::where('reference', $request->input('reference'))->first();
             if ($check) {
@@ -51,12 +46,9 @@ class StationDetailService
             $stationDetail->update([$stationDetail->reference = rand()]);
         }
         if ($file = $request->file('cover_media')) {
-            if (count(array($request->cover_media)) > 1) {
-                return response()->json(
-                    [
-                        'message' => 'Cover media only one',
-                    ]
-                );
+            $checkCoverMedia = $this->checkMedia($request->input('cover_media'), 1);
+            if ($checkCoverMedia['is_fail']) {
+                return $checkCoverMedia;
             }
             $request->cover_media->store('public/upload');
 
@@ -72,12 +64,9 @@ class StationDetailService
         $media->mediaable()->save($stationDetail);
         $data = [];
         if ($request->file('detail_media')) {
-            if (count(array($request->detail_media)) > 5) {
-                return response()->json(
-                    [
-                        'message' => 'Detail media dont more than 5',
-                    ]
-                );
+            $checkDetailMedia = $this->checkMedia($request->input('detail_media'), 5);
+            if ($checkDetailMedia['is_fail']) {
+                return $checkDetailMedia;
             }
             foreach ($request->file('detail_media') as $key => $file) {
                 $name = rand() . '.' . $file->getClientOriginalName();
@@ -97,15 +86,9 @@ class StationDetailService
 
     public function update($id, Request $request)
     {
-        $validate = Validator::make($request->all(), [
-            'vehicle_station_id' => 'required ',
-        ]);
-        if ($validate->fails()) {
-            return response()->json(
-                [
-                    'error' => $validate->errors(),
-                ], 401
-            );
+        $checkInput = $this->checkInput($request->all());
+        if ($checkInput['is_fail']) {
+            return $checkInput;
         }
         if (!empty($request->has('reference'))) {
             $check = VehicleStationDetail::where('reference', $request->input('reference'))->first();
@@ -123,14 +106,11 @@ class StationDetailService
 
         $stationDetail = VehicleStationDetail::find($id);
         if ($file = $request->file('cover_media')) {
-            if (count(array($request->cover_media)) > 1) {
-                return response()->json(
-                    [
-                        'message' => 'Cover media only one',
-                    ]
-                );
+            $checkCoverMedia = $this->checkMedia($request->input('cover_media'), 1);
+            if ($checkCoverMedia['is_fail']) {
+                return $checkCoverMedia;
             }
-            $media = $stationDetail->medias()->where('type', '=', 1)->get();
+            $media = $stationDetail->medias()->where('type', '=', 1)->first();
             $stationDetail->medias()->delete();
 
             if (File::exists(public_path() . '/upload/' . $media)) {
@@ -175,11 +155,24 @@ class StationDetailService
 
     public function delete($id)
     {
-        return $this->stationDetailRepository->delete($id);
+        return $this->stationDetailRepository->delete(VehicleStationDetail::class, $id);
     }
 
     public function search(array $inputs)
     {
-        return $this->stationDetailRepository->search($inputs);
+        return $this->stationDetailRepository->search(VehicleStationDetail::class, $inputs);
+    }
+
+    public function checkInput(array $inputs){
+        $validate = Validator::make($inputs, [
+            'vehicle_station_id' => 'required ',
+        ]);
+        if ($validate->fails()) {
+            return response()->json(
+                [
+                    'error' => $validate->errors(),
+                ], 401
+            );
+        }
     }
 }
