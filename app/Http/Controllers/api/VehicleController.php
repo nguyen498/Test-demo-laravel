@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\VehicleResource;
 use App\Models\Vehicle;
 use App\Services\VehicleService;
+use App\Utils\ResponseUtil;
 use Illuminate\Http\Request;
 
 class VehicleController extends Controller
@@ -13,44 +14,31 @@ class VehicleController extends Controller
     //
 
     protected $vehicle;
+    protected $responseUtil;
 
-    public function __construct(VehicleService $vehicle)
+    public function __construct(VehicleService $vehicle,
+                                ResponseUtil $responseUtil)
     {
         $this->vehicle = $vehicle;
+        $this->responseUtil = $responseUtil;
     }
 
     public function create(Request $request)
     {
         $data = $this->vehicle->create($request);
         if ($data['code'] != '200') {
-            return response()->json([
-                'success' => false,
-                'code' => $data['code'],
-                'error' => $data['message']
-            ]);
+            return $this->responseUtil->sendError($data['message'], $data['code']);
         }
-        return response()->json([
-            'success' => true,
-            'code' => $data['code'],
-            'data' => $data['data']
-        ]);
+        return $this->responseUtil->sendResponse('Created', $data['data']);
     }
 
     public function update($id, Request $request)
     {
         $data = $this->vehicle->update($id, $request);
         if ($data['code'] != '200') {
-            return response()->json([
-                'success' => false,
-                'code' => $data['code'],
-                'error' => $data['message']
-            ]);
+            return $this->responseUtil->sendError($data['message'], $data['code']);
         }
-        return response()->json([
-            'success' => true,
-            'code' => $data['code'],
-            'data' => $data['data']
-        ]);
+        return $this->responseUtil->sendResponse('Updated', $data['data']);
     }
 
     public function delete($id)
