@@ -112,7 +112,10 @@ class VehicleService extends BaseService
         }
 
         if (!empty($request->has('reference'))) {
-            $check = $this->vehicleRepository->check(new Vehicle(), 'reference', $request->input('reference'))->where('id', '<>', $id);
+            $check = $this->vehicleRepository->check(new Vehicle(), 'reference', [
+                'reference' => $request->input('reference'),
+                'id' => $request->input('id')
+            ]);
             if ($check) {
                 return ([
                     'code' => '004',

@@ -38,11 +38,11 @@ class StationDetailService extends BaseService
                     ], 401
                 );
             } else {
-                $stationDetail = $this->stationDetailRepository->create(VehicleStationDetail::class, $request->all());
+                $stationDetail = $this->stationDetailRepository->create(new VehicleStationDetail(), $request->all());
                 $stationDetail->update([$stationDetail->reference = $request->input('reference')]);
             }
         } else {
-            $stationDetail = $this->stationDetailRepository->create(VehicleStationDetail::class, $request->all());
+            $stationDetail = $this->stationDetailRepository->create(new VehicleStationDetail(), $request->all());
             $stationDetail->update([$stationDetail->reference = rand()]);
         }
         if ($file = $request->file('cover_media')) {
@@ -63,7 +63,6 @@ class StationDetailService extends BaseService
             $stationDetail->medias()->save($media);
         }
 
-        $media->mediaable()->save($stationDetail);
         $data = [];
         if ($request->file('detail_media')) {
             $checkDetailMedia = $this->checkMedia($request->input('detail_media'), 5);
