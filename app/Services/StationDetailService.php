@@ -167,12 +167,12 @@ class StationDetailService extends BaseService
 
     public function delete($id)
     {
-        return $this->stationDetailRepository->delete(VehicleStationDetail::class, $id);
+        return $this->stationDetailRepository->delete(new VehicleStationDetail(), $id);
     }
 
     public function search(array $inputs)
     {
-        return $this->stationDetailRepository->search(VehicleStationDetail::class, $inputs);
+        return $this->stationDetailRepository->search(new VehicleStationDetail(), $inputs);
     }
 
     public function checkInput(array $inputs)
@@ -183,7 +183,8 @@ class StationDetailService extends BaseService
         if ($validate->fails()) {
             return response()->json(
                 [
-                    'error' => $validate->errors(),
+                    'code' => '001',
+                    'message' => $validate->errors(),
                 ], 401
             );
         }
