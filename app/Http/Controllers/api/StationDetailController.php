@@ -49,7 +49,10 @@ class StationDetailController extends Controller
 
     public function search(Request $request)
     {
-        $stationDetails = $this->stationDetailService->search($request->all());
-        return VehicleStationDetailResource::collection($stationDetails);
+        $data = $this->stationDetailService->search($request->all());
+        if ($data['code'] != '200') {
+            return $this->responseUtil->sendError($data['message'], $data['code']);
+        }
+        return $this->responseUtil->sendResponse('Searched', $data['data']);
     }
 }

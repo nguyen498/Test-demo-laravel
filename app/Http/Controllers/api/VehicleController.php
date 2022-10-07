@@ -57,11 +57,4 @@ class VehicleController extends Controller
 //            'data' => $result
 //        ], 200);
     }
-
-    public function findId($id)
-    {
-        $data = Vehicle::findOrFail($id);
-//        $vehicle = VehicleResource::collection($data);
-        return new VehicleResource($data);
-    }
 }

@@ -50,7 +50,10 @@ class StationController extends Controller
 
     public function search(Request $request)
     {
-        $station = $this->stationServices->search($request->all());
-        return VehicleStationResource::collection($station);
+        $data = $this->stationServices->search($request->all());
+        if ($data['code'] != '200') {
+            return $this->responseUtil->sendError($data['message'], $data['code']);
+        }
+        return $this->responseUtil->sendResponse('Searched', $data['data']);
     }
 }

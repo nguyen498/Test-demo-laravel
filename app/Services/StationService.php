@@ -169,6 +169,16 @@ class StationService extends BaseService
         ];
     }
 
+    public function delete($id)
+    {
+        return $this->stationRepository->delete(new VehicleStation(), $id);
+    }
+
+    public function search($inputs)
+    {
+        return $this->stationRepository->search(new VehicleStation(), $inputs);
+    }
+
     public function checkInput($inputs)
     {
         $validate = Validator::make($inputs, [
