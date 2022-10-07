@@ -11,13 +11,13 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\File;
 
-class VehicleService
+class VehicleService extends BaseService
 {
     protected $vehicleRepository;
     protected $mediaRepository;
 
     public function __construct(VehicleRepository $vehicleRepository,
-                                MediaRepository $mediaRepository)
+                                MediaRepository   $mediaRepository)
     {
         $this->vehicleRepository = $vehicleRepository;
         $this->mediaRepository = $mediaRepository;
@@ -25,65 +25,51 @@ class VehicleService
 
     public function create(Request $request)
     {
-        $validate = Validator::make($request->all(), [
-            'name' => 'required',
-            'vehicle_number' => 'required',
-            'price' => 'required | numeric',
-//            'cover_media' => 'required | mimes: jpg, png, jpeg',
-//            'detail_media' => 'required | mimes: jpg, png, jpeg'
-        ]);
-        if ($validate->fails()) {
-            return response()->json(
-                [
-                    'error' => $validate->errors(),
-                ], 401
-            );
+
+        $checkInput = $this->checkInput($request->all());
+        if ($checkInput['is_fail']) {
+            return $checkInput;
         }
 
         if (!empty($request->has('reference'))) {
-//            $check = Vehicle::where('reference', $request->input('reference'))->first();
-            $check = $this->vehicleRepository->check('reference', ['reference'=>$request->input('reference')]);
+            $check = $this->vehicleRepository->check(new Vehicle(), 'reference',
+                ['reference' => $request->input('reference')]);
             if ($check) {
-                return response()->json(
-                    [
-                        'message' => 'Reference is duplicate',
-                    ], 401
-                );
+                return ([
+                    'code' => '002',
+                    'message' => 'Reference is duplicate',
+                ]);
             } else {
-                $vehicle = $this->vehicleRepository->create($request->all());
-                $this->vehicleRepository->update($vehicle->id, [
+                $vehicle = $this->vehicleRepository->create(new Vehicle(), $request->all());
+                $this->vehicleRepository->update(new Vehicle(), $vehicle->id, [
                     'use_period' => Carbon::now()->addYears(1),
                     'user_id' => 1,
                     'reference' => $request->input('reference'),
                 ]);
             }
         } else {
-            $vehicle = $this->vehicleRepository->create($request->all());
-            $this->vehicleRepository->update($vehicle->id, [
+            $vehicle = $this->vehicleRepository->create(new Vehicle(), $request->all());
+            $this->vehicleRepository->update(new Vehicle(), $vehicle->id, [
                 'use_period' => Carbon::now()->addYears(1),
                 'user_id' => 1,
                 'reference' => rand(),
             ]);
         }
         if ($file = $request->file('cover_media')) {
-            if (count(array($request->cover_media)) > 1) {
-                return response()->json(
-                    [
-                        'message' => 'Cover media only one',
-                    ], 401
-                );
+
+            $checkCoverMedia = $this->checkMedia($request->input('cover_media'), 1);
+            if ($checkCoverMedia['is_fail']) {
+                return $checkCoverMedia;
             }
+
             $request->cover_media->store(public_path() . '/upload');
 
             $name = rand() . '.' . $file->getClientOriginalName();
             $file->move(public_path() . '/upload', $name);
-//            $media = new Media();
-//            $media->path = $name;
-//            $media->type = 1;
 
             $media = $this->mediaRepository->create([
                 'name' => $name,
-                'path' => '/upload/'.$name,
+                'path' => '/upload/' . $name,
                 'type' => 1
             ]);
 
@@ -92,19 +78,18 @@ class VehicleService
         $media->mediaable()->save($vehicle);
         $data = [];
         if ($request->file('detail_media')) {
-            if (count(array($request->detail_media)) > 5) {
-                return response()->json(
-                    [
-                        'message' => 'Detail media dont more than 5',
-                    ], 401
-                );
+
+            $checkDetailMedia = $this->checkMedia($request->input('detail_media'), 5);
+            if ($checkDetailMedia['is_fail']) {
+                return $checkDetailMedia;
             }
+
             foreach ($request->file('detail_media') as $key => $file) {
                 $name = rand() . '.' . $file->getClientOriginalName();
                 $file->move(public_path() . '/upload', $name);
                 $media = $this->mediaRepository->create([
                     'name' => $name,
-                    'path' => '/upload/'.$name,
+                    'path' => '/upload/' . $name,
                     'type' => 2
                 ]);
                 $vehicle->medias()->save($media);
@@ -113,49 +98,41 @@ class VehicleService
             }
         }
 
-        return $vehicle;
+        return [
+            'code' => '200',
+            'data' => $vehicle
+        ];
     }
 
     public function update($id, Request $request)
     {
-        $validate = Validator::make($request->all(), [
-            'name' => 'required',
-            'vehicle_number' => 'required',
-            'price' => 'required | numeric'
-        ]);
-        if ($validate->fails()) {
-            return response()->json(
-                [
-                    'error' => $validate->errors(),
-                ], 401
-            );
+        $checkInput = $this->checkInput($request->all());
+        if ($checkInput['is_fail']) {
+            return $checkInput;
         }
 
         if (!empty($request->has('reference'))) {
-//            $check = Vehicle::where('reference', $request->input('reference'))->first();
-            $check = $this->vehicleRepository->check('reference', $request->input('reference'))->where('id', '<>', $id);
+            $check = $this->vehicleRepository->check(new Vehicle(), 'reference', $request->input('reference'))->where('id', '<>', $id);
             if ($check) {
-                return response()->json(
-                    [
-                        'message' => 'Reference is duplicate',
-                    ], 401
-                );
+                return ([
+                    'code' => '004',
+                    'message' => 'Reference is duplicate',
+                ]);
             } else {
-                $vehicle = $this->vehicleRepository->update($id, $request->all());
-                $vehicle->use_period = Carbon::now()->addYears(1);
-                $vehicle->user_id = 1;
-                $vehicle->reference = $request->input('reference');
+                $this->vehicleRepository->update(new Vehicle(), $id, $request->all());
+                $this->vehicleRepository->update(new Vehicle(), $id, [
+                    'use_period' => Carbon::now()->addYears(1),
+                    'user_id' => 1,
+                    'reference' => $request->input('reference')
+                ]);
             }
         }
 
-        $vehicle = $this->vehicleRepository->findId($id);
+        $vehicle = $this->vehicleRepository->findId(new Vehicle(), $id)->first();
         if ($file = $request->file('cover_media')) {
-            if (count(array($request->cover_media)) > 1) {
-                return response()->json(
-                    [
-                        'message' => 'Cover media only one',
-                    ], 401
-                );
+            $checkCoverMedia = $this->checkMedia($request->input('cover_media'), 1);
+            if ($checkCoverMedia['is_fail']) {
+                return $checkCoverMedia;
             }
             $media = $vehicle->medias()->get();
             $vehicle->medias()->delete();
@@ -177,15 +154,13 @@ class VehicleService
             $vehicle->medias()->save($media);
         }
         if ($request->file('detail_media')) {
-            if (count(array_filter($request->detail_media)) > 5) {
-                return response()->json(
-                    [
-                        'message' => 'Detail media dont more than 5',
-                    ], 401
-                );
+            $checkDetailMedia = $this->checkMedia($request->input('detail_media'), 5);
+            if ($checkDetailMedia['is_fail']) {
+                return $checkDetailMedia;
             }
+
             $data = [];
-            $detailmedia = $vehicle->medias()->where('type', '=', 2)->get();
+            $detailmedia = $vehicle->detail_medias()->get();
             if (File::exists(public_path() . '/upload/' . $detailmedia)) {
                 File::delete(public_path() . '/upload/' . $detailmedia);
             }
@@ -199,20 +174,47 @@ class VehicleService
                     'path' => '/upload/' . $name,
                     'type' => 2
                 ]);
-                $vehicle->medias()->save($media);
+                $vehicle->detail_medias()->save($media);
                 $data[$key] = $media;
             }
         }
-        return $vehicle;
+        return [
+            'code' => '200',
+            'data' => $vehicle
+        ];
     }
 
     public function delete($id)
     {
-        return $this->vehicleRepository->delete($id);
+        return $this->vehicleRepository->delete(new Vehicle(), $id);
     }
 
     public function search($inputs)
     {
-        return $this->vehicleRepository->search($inputs);
+        return $this->vehicleRepository->search(new Vehicle(), $inputs);
     }
+
+    public function checkInput(array $input)
+    {
+        $validate = Validator::make($input, [
+            'name' => 'required',
+            'vehicle_number' => 'required',
+            'price' => 'required | numeric',
+            'cover_media' => 'required|mimes:jpg,jpeg,png,bmp|max:20000',
+            'detail_media.*' => 'required|mimes:jpg,jpeg,png,bmp|max:20000'
+        ]);
+        if ($validate->fails()) {
+            return (
+            [
+                'is_fail' => true,
+                'code' => '001',
+                'message' => $validate->errors(),
+            ]
+            );
+        }
+        return [
+            'is_fail' => false,
+        ];
+    }
+
 }

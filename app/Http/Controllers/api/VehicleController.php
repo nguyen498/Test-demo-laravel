@@ -21,10 +21,19 @@ class VehicleController extends Controller
 
     public function create(Request $request){
         $data = $this->vehicle->create($request);
-//        return new VehicleResource($data);
+        if($data['code'] != '200') {
+            return response()->json([
+                'success' => false,
+                'code' => $data['code'],
+                'error' => $data['message']
+            ], 200);
+        }
         return response()->json([
-            'data' => $data,
-        ], 201);
+            'success' => true,
+            'code' => $data['code'],
+            'data' => $data['data']
+        ]);
+//        return $data;
     }
 
     public function update($id, Request $request){

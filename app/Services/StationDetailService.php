@@ -43,11 +43,11 @@ class StationDetailService
                     ], 401
                 );
             } else {
-                $stationDetail = $this->stationDetailRepository->create($request->all());
+                $stationDetail = $this->stationDetailRepository->create(VehicleStationDetail::class,$request->all());
                 $stationDetail->update([$stationDetail->reference = $request->input('reference')]);
             }
         } else {
-            $stationDetail = $this->stationDetailRepository->create($request->all());
+            $stationDetail = $this->stationDetailRepository->create(VehicleStationDetail::class,$request->all());
             $stationDetail->update([$stationDetail->reference = rand()]);
         }
         if ($file = $request->file('cover_media')) {
@@ -116,7 +116,7 @@ class StationDetailService
                     ], 401
                 );
             } else {
-                $stationDetail = $this->stationDetailRepository->update($id, $request->all());
+                $stationDetail = $this->stationDetailRepository->update(VehicleStationDetail::class, $id, $request->all());
                 $stationDetail->update([$stationDetail->reference = $request->input('reference')]);
             }
         }
