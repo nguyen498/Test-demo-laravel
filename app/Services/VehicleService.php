@@ -199,7 +199,7 @@ class VehicleService extends BaseService
         $validate = Validator::make($input, [
             'name' => 'required',
             'vehicle_number' => 'required',
-            'price' => 'required | numeric',
+            'price' => 'required | numeric | min:0',
             'cover_media' => 'required|mimes:jpg,jpeg,png,bmp|max:20000',
             'detail_media.*' => 'required|mimes:jpg,jpeg,png,bmp|max:20000'
         ]);
