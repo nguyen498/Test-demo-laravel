@@ -72,17 +72,7 @@ class StationService extends BaseService
                 return $checkDetailMedia;
             }
 
-            foreach ($request->file('detail_media') as $key => $file) {
-                $name = rand() . '.' . $file->getClientOriginalName();
-                $file->move(public_path() . '/upload', $name);
-                $media = $this->mediaRepository->create(new Media(), [
-                    'name' => $name,
-                    'path' => '/upload/' . $name,
-                    'type' => 2
-                ]);
-                $station->medias()->save($media);
-                $data[$key] = $media;
-            }
+            $this->saveDetailMedia($request, $station, []);
         }
 
         return [
@@ -113,7 +103,7 @@ class StationService extends BaseService
             }
         }
 
-        $station = $this->stationRepository->findId(new VehicleStation(), $id)->first();
+        $station = $this->stationRepository->findId(new VehicleStation(), $id, [])->first();
         if ($file = $request->file('cover_media')) {
             $checkCoverMedia = $this->checkMedia($request->input('cover_media'), 1);
             if ($checkCoverMedia['is_fail']) {
@@ -194,6 +184,36 @@ class StationService extends BaseService
                 'message' => $validate->errors(),
             ];
         }
+        if (!empty($request->reference)) {
+            $input_check = ['reference' => $request->input('reference')];
+            if (isset($id)) {
+                $input_check['id'] = $id;
+            }
+            $check = $this->stationRepository->check(new VehicleStation(), 'reference', $input_check);
+            if ($check) {
+                return ([
+                    'is_fail' => true,
+                    'code' => '002',
+                    'message' => 'Reference is duplicate',
+                ]);
+            }
+        }
+
+        if ($request->file('cover_media')) {
+            $checkCoverMedia = $this->checkMedia($request->input('cover_media'), 1);
+            if ($checkCoverMedia['is_fail']) {
+                return $checkCoverMedia;
+            }
+        }
+
+        if ($request->hasFile('detail_media')) {
+            $checkDetailMedia = $this->checkMedia($request->input('detail_media'), 5);
+            if ($checkDetailMedia['is_fail']) {
+                return $checkDetailMedia;
+            }
+        }
+
+
         return ['is_fail' => false];
     }
 

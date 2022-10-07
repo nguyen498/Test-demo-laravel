@@ -25,165 +25,75 @@ class VehicleService extends BaseService
 
     public function create(Request $request)
     {
-
-        $checkInput = $this->checkInput($request->all());
+        //check request
+        $checkInput = $this->checkInput($request, null);
         if ($checkInput['is_fail']) {
             return $checkInput;
         }
-
-        if (!empty($request->has('reference'))) {
-            $check = $this->vehicleRepository->check(new Vehicle(), 'reference',
-                ['reference' => $request->input('reference')]);
-            if ($check) {
-                return ([
-                    'code' => '002',
-                    'message' => 'Reference is duplicate',
-                ]);
-            } else {
-                $vehicle = $this->vehicleRepository->create(new Vehicle(), $request->all());
-                $this->vehicleRepository->update(new Vehicle(), $vehicle->id, [
-                    'use_period' => Carbon::now()->addYears(1),
-                    'user_id' => 1,
-                    'reference' => $request->input('reference'),
-                ]);
-            }
-        } else {
-            $vehicle = $this->vehicleRepository->create(new Vehicle(), $request->all());
-            $this->vehicleRepository->update(new Vehicle(), $vehicle->id, [
-                'use_period' => Carbon::now()->addYears(1),
-                'user_id' => 1,
-                'reference' => rand(),
-            ]);
+        //create Vehicle
+        $vehicle = $this->vehicleRepository->create(new Vehicle(), $request->all());
+        $reference = $request->input('reference');
+        if (empty($reference)) {
+            $reference = rand();
         }
-        if ($file = $request->file('cover_media')) {
-
-            $checkCoverMedia = $this->checkMedia($request->input('cover_media'), 1);
-            if ($checkCoverMedia['is_fail']) {
-                return $checkCoverMedia;
-            }
-
-            $request->cover_media->store(public_path() . '/upload');
-
-            $name = rand() . '.' . $file->getClientOriginalName();
-            $file->move(public_path() . '/upload', $name);
-
-            $media = $this->mediaRepository->create( new Media(), [
-                'name' => $name,
-                'path' => '/upload/' . $name,
-                'type' => 1
-            ]);
-
-            $vehicle->medias()->save($media);
-        }
-        $media->mediaable()->save($vehicle);
-        $data = [];
-        if ($request->file('detail_media')) {
-
-            $checkDetailMedia = $this->checkMedia($request->input('detail_media'), 5);
-            if ($checkDetailMedia['is_fail']) {
-                return $checkDetailMedia;
-            }
-
-            foreach ($request->file('detail_media') as $key => $file) {
-                $name = rand() . '.' . $file->getClientOriginalName();
-                $file->move(public_path() . '/upload', $name);
-                $media = $this->mediaRepository->create( new Media(), [
-                    'name' => $name,
-                    'path' => '/upload/' . $name,
-                    'type' => 2
-                ]);
+        $this->vehicleRepository->update(new Vehicle(), $vehicle->id, [
+            'use_period' => Carbon::now()->addYears(1),
+            'user_id' => 1,
+            'reference' => $reference,
+        ]);
+        //save cover media
+        if ($request->hasFile('cover_media')) {
+            $media = $this->saveCoverMedia($request);
+            if (isset($media)) {
                 $vehicle->medias()->save($media);
-                $media->mediaable()->save($vehicle);
-                $data[$key] = $media;
             }
         }
-
+        //save detail media
+        if ($request->hasFile('detail_media')) {
+            $this->saveDetailMedia($request, $vehicle, []);
+        }
+        $vehicle = $this->vehicleRepository->findId(new Vehicle(), $vehicle->id, ['medias', 'detail_medias']);
         return [
             'code' => '200',
-            'data' => $vehicle
+            'data' => [
+                'vehicle' => $vehicle,
+            ]
         ];
     }
 
     public function update($id, Request $request)
     {
-        $checkInput = $this->checkInput($request->all());
+        $checkInput = $this->checkInput($request, $id);
         if ($checkInput['is_fail']) {
             return $checkInput;
         }
+        $vehicle = $this->vehicleRepository->update(new Vehicle(), $id, $request->all());
+        $reference = $request->input('reference');
+        $this->vehicleRepository->update(new Vehicle(), $vehicle->id, [
+            'reference' => $reference,
+        ]);
 
-        if (!empty($request->has('reference'))) {
-            $check = $this->vehicleRepository->check(new Vehicle(), 'reference', [
-                'reference' => $request->input('reference'),
-                'id' => $request->input('id')
-            ]);
-            if ($check) {
-                return ([
-                    'code' => '004',
-                    'message' => 'Reference is duplicate',
-                ]);
-            } else {
-                $this->vehicleRepository->update(new Vehicle(), $id, $request->all());
-                $this->vehicleRepository->update(new Vehicle(), $id, [
-                    'use_period' => Carbon::now()->addYears(1),
-                    'user_id' => 1,
-                    'reference' => $request->input('reference')
-                ]);
-            }
-        }
-
-        $vehicle = $this->vehicleRepository->findId(new Vehicle(), $id)->first();
-        if ($file = $request->file('cover_media')) {
-            $checkCoverMedia = $this->checkMedia($request->input('cover_media'), 1);
-            if ($checkCoverMedia['is_fail']) {
-                return $checkCoverMedia;
-            }
-            $media = $vehicle->medias()->get();
+        $vehicle = $this->vehicleRepository->findId(new Vehicle(), $id, [])->first();
+        if ($request->file('cover_media')) {
             $vehicle->medias()->delete();
-
-            if (File::exists(public_path() . '/upload/' . $media)) {
-                File::delete(public_path() . '/upload/' . $media);
+            $media = $this->saveCoverMedia($request);
+            if (isset($media)) {
+                $vehicle->medias()->save($media);
             }
-
-            $request->cover_media->store(public_path() . '/upload');
-
-            $name = rand() . '.' . $file->getClientOriginalName();
-            $file->move(public_path() . '/upload', $name);
-
-            $media = $this->mediaRepository->create( new Media(), [
-                'name' => $name,
-                'path' => '/upload/' . $name,
-                'type' => 1
-            ]);
-            $vehicle->medias()->save($media);
         }
+        $data = [];
         if ($request->file('detail_media')) {
-            $checkDetailMedia = $this->checkMedia($request->input('detail_media'), 5);
-            if ($checkDetailMedia['is_fail']) {
-                return $checkDetailMedia;
-            }
-
-            $data = [];
-            $detailmedia = $vehicle->detail_medias()->get();
-            if (File::exists(public_path() . '/upload/' . $detailmedia)) {
-                File::delete(public_path() . '/upload/' . $detailmedia);
-            }
-
-            foreach ($request->file('detail_media') as $key => $file) {
-                $name = rand() . '.' . $file->getClientOriginalName();
-                $file->move(public_path() . '/upload', $name);
-
-                $media = $this->mediaRepository->create( new Media(), [
-                    'name' => $name,
-                    'path' => '/upload/' . $name,
-                    'type' => 2
-                ]);
-                $vehicle->detail_medias()->save($media);
-                $data[$key] = $media;
+            $vehicle->detail_medias()->delete();
+            if ($request->hasFile('detail_media')) {
+                $data = $this->saveDetailMedia($request, $vehicle, []);
             }
         }
+        $vehicle = $this->vehicleRepository->findId(new Vehicle(), $vehicle->id, ['medias', 'detail_medias']);
         return [
             'code' => '200',
-            'data' => $vehicle
+            'data' => [
+                'vehicle' => $vehicle,
+            ]
         ];
     }
 
@@ -197,9 +107,9 @@ class VehicleService extends BaseService
         return $this->vehicleRepository->search(new Vehicle(), $inputs);
     }
 
-    public function checkInput(array $input)
+    public function checkInput($request, $id)
     {
-        $validate = Validator::make($input, [
+        $validate = Validator::make($request->all(), [
             'name' => 'required',
             'vehicle_number' => 'required',
             'price' => 'required | numeric | min:0',
@@ -215,9 +125,36 @@ class VehicleService extends BaseService
             ]
             );
         }
+        if (!empty($request->reference)) {
+            $input_check = ['reference' => $request->input('reference')];
+            if (isset($id)) {
+                $input_check['id'] = $id;
+            }
+            $check = $this->vehicleRepository->check(new Vehicle(), 'reference', $input_check);
+            if ($check) {
+                return ([
+                    'is_fail' => true,
+                    'code' => '002',
+                    'message' => 'Reference is duplicate',
+                ]);
+            }
+        }
+
+        if ($request->file('cover_media')) {
+            $checkCoverMedia = $this->checkMedia($request->input('cover_media'), 1);
+            if ($checkCoverMedia['is_fail']) {
+                return $checkCoverMedia;
+            }
+        }
+
+        if ($request->hasFile('detail_media')) {
+            $checkDetailMedia = $this->checkMedia($request->input('detail_media'), 5);
+            if ($checkDetailMedia['is_fail']) {
+                return $checkDetailMedia;
+            }
+        }
         return [
             'is_fail' => false,
         ];
     }
-
 }

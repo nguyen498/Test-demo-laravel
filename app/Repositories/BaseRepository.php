@@ -4,13 +4,13 @@ namespace App\Repositories;
 
 class BaseRepository
 {
-    public function create($model,array $inputs)
+    public function create($model, array $inputs)
     {
         $data = $model->create($inputs);
         return $data;
     }
 
-    public function update($model, $id,array $inputs)
+    public function update($model, $id, array $inputs)
     {
         $data = $model->findOrFail($id);
         $data->update($inputs);
@@ -34,17 +34,22 @@ class BaseRepository
         return $data;
     }
 
-    public function check($model, $field,array $input){
+    public function check($model, $field, array $input)
+    {
         $query = $model->where($field, $input[$field]);
-        if(isset($input['id']) && empty($input['id'])){
+        if (isset($input['id']) && empty($input['id'])) {
             $query->where('id ', '<> ', $input['id']);
         }
         $check = $query->first();
         return $check;
     }
 
-    public function findId($model, $input){
+    public function findId($model, $input, array $with)
+    {
         $data = $model->where('id', '=', $input);
-        return $data;
+        if (count($with) > 0) {
+            $data->with($with);
+        }
+        return $data->get();
     }
 }

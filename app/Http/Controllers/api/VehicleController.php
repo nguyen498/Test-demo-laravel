@@ -51,10 +51,10 @@ class VehicleController extends Controller
 
     public function search(Request $request)
     {
-        $result = $this->vehicle->search($request->all());
-        return VehicleResource::collection($result);
-//      return response()->json([
-//            'data' => $result
-//        ], 200);
+        $data = $this->vehicle->search($request->all());
+        if ($data['code'] != '200') {
+            return $this->responseUtil->sendError($data['message'], $data['code']);
+        }
+        return $this->responseUtil->sendResponse('Searched', $data['data']);
     }
 }
