@@ -7,6 +7,7 @@ use App\Models\VehicleStation;
 use App\Repositories\MediaRepository;
 use App\Repositories\StationRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
@@ -96,15 +97,15 @@ class StationService extends BaseService
         if ($checkInput['is_fail']) {
             return $checkInput;
         }
-        if (!empty($request->has('phone'))) {
-            $check = $this->stationRepository->check(new VehicleStation(), 'phone', [
-                'phone' => $request->input('phone'),
+        if (!empty($request->has('reference'))) {
+            $check = $this->stationRepository->check(new VehicleStation(), 'reference', [
+                'reference' => $request->input('reference'),
                 'id' => $request->input('id')
             ]);
             if ($check) {
                 return ([
                     'code' => '002',
-                    'message' => 'Phone is duplicate',
+                    'message' => 'Reference is duplicate',
                 ]);
             } else {
                 $station = $this->stationRepository->update(new VehicleStation(), $id, $request->all());
