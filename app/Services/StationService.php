@@ -30,19 +30,19 @@ class StationService extends BaseService
         }
 
         if (!empty($request->has('reference'))) {
-            $check = $this->stationRepository->check(VehicleStation::class, 'reference', ['reference' => $request->input('reference')]);
+            $check = $this->stationRepository->check(new VehicleStation(), 'reference',
+                ['reference' => $request->input('reference')]);
             if ($check) {
-                return response()->json(
-                    [
-                        'message' => 'Reference is duplicate',
-                    ], 401
-                );
+                return ([
+                    'code' => '002',
+                    'message' => 'Reference is duplicate',
+                ]);
             } else {
-                $station = $this->stationRepository->create(VehicleStation::class, $request->all());
+                $station = $this->stationRepository->create(new VehicleStation(), $request->all());
                 $station->update([$station->reference = $request->input('reference')]);
             }
         } else {
-            $station = $this->stationRepository->create(VehicleStation::class, $request->all());
+            $station = $this->stationRepository->create(new VehicleStation(), $request->all());
             $station->update([$station->reference = rand()]);
         }
         if ($file = $request->file('cover_media')) {
@@ -54,7 +54,7 @@ class StationService extends BaseService
 
             $name = rand() . '.' . $file->getClientOriginalName();
             $file->move(public_path() . '/upload', $name);
-            $media = $this->mediaRepository->create( [
+            $media = $this->mediaRepository->create(new Media(), [
                 'name' => $name,
                 'path' => '/upload/' . $name,
                 'type' => 2
@@ -74,7 +74,7 @@ class StationService extends BaseService
             foreach ($request->file('detail_media') as $key => $file) {
                 $name = rand() . '.' . $file->getClientOriginalName();
                 $file->move(public_path() . '/upload', $name);
-                $media = $this->mediaRepository->create( [
+                $media = $this->mediaRepository->create(new Media(), [
                     'name' => $name,
                     'path' => '/upload/' . $name,
                     'type' => 2
@@ -84,33 +84,35 @@ class StationService extends BaseService
             }
         }
 
-        return $station;
+        return [
+            'code' => '200',
+            'data' => $station
+        ];
     }
 
     public function update($id, Request $request)
     {
-        $checkInput = $this->checkInput($request);
-        if($checkInput['is_fail']){
+        $checkInput = $this->checkInput($request->all());
+        if ($checkInput['is_fail']) {
             return $checkInput;
         }
         if (!empty($request->has('phone'))) {
-            $check = $this->stationRepository->check(VehicleStation::class, 'phone', [
+            $check = $this->stationRepository->check(new VehicleStation(), 'phone', [
                 'phone' => $request->input('phone'),
                 'id' => $request->input('id')
             ]);
             if ($check) {
-                return response()->json(
-                    [
-                        'message' => 'Reference is duplicate',
-                    ], 401
-                );
+                return ([
+                    'code' => '002',
+                    'message' => 'Phone is duplicate',
+                ]);
             } else {
-                $station = $this->stationRepository->update(VehicleStation::class, $id, $request->all());
+                $station = $this->stationRepository->update(new VehicleStation(), $id, $request->all());
                 $station->update([$station->reference = $request->input('reference')]);
             }
         }
 
-        $station = $this->stationRepository->findId(VehicleStation::class ,$id)->first();
+        $station = $this->stationRepository->findId(new VehicleStation(), $id)->first();
         if ($file = $request->file('cover_media')) {
             $checkCoverMedia = $this->checkMedia($request->input('cover_media'), 1);
             if ($checkCoverMedia['is_fail']) {
@@ -128,7 +130,7 @@ class StationService extends BaseService
             $name = rand() . '.' . $file->getClientOriginalName();
             $file->move(public_path() . '/upload', $name);
 
-            $media = $this->mediaRepository->create([
+            $media = $this->mediaRepository->create(new Media(), [
                 'name' => $name,
                 'path' => '/upload/' . $name,
                 'type' => 1
@@ -150,7 +152,7 @@ class StationService extends BaseService
                 $name = rand() . '.' . $file->getClientOriginalName();
                 $file->move(public_path() . '/upload', $name);
 
-                $media = $this->mediaRepository->create([
+                $media = $this->mediaRepository->create(new Media(), [
                     'name' => $name,
                     'path' => '/upload/' . $name,
                     'type' => 2
@@ -160,7 +162,10 @@ class StationService extends BaseService
             }
         }
 
-        return $station;
+        return [
+            'code' => '200',
+            'data' => $station
+        ];
     }
 
     public function checkInput($inputs)
@@ -168,8 +173,8 @@ class StationService extends BaseService
         $validate = Validator::make($inputs, [
             'name' => 'required',
             'phone' => 'required | numeric | digits:11',
-            'cover_media' => 'required | mimes:jpeg png jpg | max:20000',
-            'detail_media' => 'required | mimes:jpeg png jpg | max:20000'
+            'cover_media' => 'required|mimes:jpg,jpeg,png,bmp|max:20000',
+            'detail_media.*' => 'required|mimes:jpg,jpeg,png,bmp|max:20000'
         ]);
         if ($validate->fails()) {
             return [

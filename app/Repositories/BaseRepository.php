@@ -34,10 +34,10 @@ class BaseRepository
         return $data;
     }
 
-    public function check($model, $field, array $input){
+    public function check($model, $field,array $input){
         $query = $model->where($field, $input[$field]);
-        if(isset($inputs['id']) &&empty($inputs['id'])){
-            $query->where('id', '<>', $input['id']);
+        if(isset($input['id']) && empty($input['id'])){
+            $query->where('id ', '<> ', $input['id']);
         }
         $check = $query->first();
         return $check;

@@ -4,15 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Media;
 
-class MediaRepository
+class MediaRepository extends BaseRepository
 {
-    public function create ($input){
-        $media = Media::create($input);
-        return $media;
-    }
 
-    public function delete ($id){
-        $media = Media::find($id);
-        return $media->delete();
-    }
 }

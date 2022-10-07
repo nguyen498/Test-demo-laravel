@@ -38,11 +38,11 @@ class StationDetailService extends BaseService
                     ], 401
                 );
             } else {
-                $stationDetail = $this->stationDetailRepository->create(VehicleStationDetail::class,$request->all());
+                $stationDetail = $this->stationDetailRepository->create(VehicleStationDetail::class, $request->all());
                 $stationDetail->update([$stationDetail->reference = $request->input('reference')]);
             }
         } else {
-            $stationDetail = $this->stationDetailRepository->create(VehicleStationDetail::class,$request->all());
+            $stationDetail = $this->stationDetailRepository->create(VehicleStationDetail::class, $request->all());
             $stationDetail->update([$stationDetail->reference = rand()]);
         }
         if ($file = $request->file('cover_media')) {
@@ -54,9 +54,11 @@ class StationDetailService extends BaseService
 
             $name = rand() . '.' . $file->getClientOriginalName();
             $file->move(public_path() . '/upload', $name);
-            $media = new Media();
-            $media->path = $name;
-            $media->type = 1;
+            $media = $this->mediaRepository->create(new Media(), [
+                'name' => $name,
+                'path' => '/upload/' . $name,
+                'type' => 1
+            ]);
 
             $stationDetail->medias()->save($media);
         }
@@ -71,16 +73,19 @@ class StationDetailService extends BaseService
             foreach ($request->file('detail_media') as $key => $file) {
                 $name = rand() . '.' . $file->getClientOriginalName();
                 $file->move(public_path() . '/upload', $name);
-                $media = new Media();
-                $media->path = $name;
-                $media->type = 2;
-                $media->save();
+                $media = $this->mediaRepository->create(new Media(), [
+                    'name' => $name,
+                    'path' => '/upload/' . $name,
+                    'type' => 2
+                ]);
                 $stationDetail->medias()->save($media);
-                $media->mediaable()->save($stationDetail);
                 $data[$key] = $media;
             }
         }
-        return $stationDetail;
+        return [
+            'code' => '200',
+            'data' => $stationDetail
+        ];
 
     }
 
@@ -122,17 +127,18 @@ class StationDetailService extends BaseService
             $name = rand() . '.' . $file->getClientOriginalName();
             $file->move(public_path() . '/upload', $name);
 
-            $media = $this->mediaRepository->create($name);
+            $media = $this->mediaRepository->create(new Media(), [
+                'name' => $name,
+                'path' => '/upload/' . $name,
+                'type' => 1
+            ]);
             $media->type = 1;
             $stationDetail->medias()->save($media);
         }
         if ($request->file('detail_media')) {
-            if (count(array_filter($request->detail_media)) > 5) {
-                return response()->json(
-                    [
-                        'message' => 'Detail media dont more than 5',
-                    ]
-                );
+            $checkDetailMedia = $this->checkMedia($request->input('detail_media'), 5);
+            if ($checkDetailMedia['is_fail']) {
+                return $checkDetailMedia;
             }
             $data = [];
             $detailmedia = $stationDetail->medias()->where('type', '=', 2)->get();
@@ -144,13 +150,20 @@ class StationDetailService extends BaseService
                 $name = rand() . '.' . $file->getClientOriginalName();
                 $file->move(public_path() . '/upload', $name);
 
-                $media = $this->mediaRepository->create($name);
+                $media = $this->mediaRepository->create(new Media(), [
+                    'name' => $name,
+                    'path' => '/upload/' . $name,
+                    'type' => 2
+                ]);
                 $media->type = 2;
                 $stationDetail->medias()->save($media);
                 $data[$key] = $media;
             }
         }
-        return $stationDetail;
+        return [
+            'code' => '200',
+            'data' => $stationDetail
+        ];
     }
 
     public function delete($id)
@@ -163,7 +176,8 @@ class StationDetailService extends BaseService
         return $this->stationDetailRepository->search(VehicleStationDetail::class, $inputs);
     }
 
-    public function checkInput(array $inputs){
+    public function checkInput(array $inputs)
+    {
         $validate = Validator::make($inputs, [
             'vehicle_station_id' => 'required ',
         ]);

@@ -67,7 +67,7 @@ class VehicleService extends BaseService
             $name = rand() . '.' . $file->getClientOriginalName();
             $file->move(public_path() . '/upload', $name);
 
-            $media = $this->mediaRepository->create([
+            $media = $this->mediaRepository->create( new Media(), [
                 'name' => $name,
                 'path' => '/upload/' . $name,
                 'type' => 1
@@ -87,7 +87,7 @@ class VehicleService extends BaseService
             foreach ($request->file('detail_media') as $key => $file) {
                 $name = rand() . '.' . $file->getClientOriginalName();
                 $file->move(public_path() . '/upload', $name);
-                $media = $this->mediaRepository->create([
+                $media = $this->mediaRepository->create( new Media(), [
                     'name' => $name,
                     'path' => '/upload/' . $name,
                     'type' => 2
@@ -146,7 +146,7 @@ class VehicleService extends BaseService
             $name = rand() . '.' . $file->getClientOriginalName();
             $file->move(public_path() . '/upload', $name);
 
-            $media = $this->mediaRepository->create([
+            $media = $this->mediaRepository->create( new Media(), [
                 'name' => $name,
                 'path' => '/upload/' . $name,
                 'type' => 1
@@ -169,7 +169,7 @@ class VehicleService extends BaseService
                 $name = rand() . '.' . $file->getClientOriginalName();
                 $file->move(public_path() . '/upload', $name);
 
-                $media = $this->mediaRepository->create([
+                $media = $this->mediaRepository->create( new Media(), [
                     'name' => $name,
                     'path' => '/upload/' . $name,
                     'type' => 2

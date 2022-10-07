@@ -19,47 +19,59 @@ class VehicleController extends Controller
         $this->vehicle = $vehicle;
     }
 
-    public function create(Request $request){
+    public function create(Request $request)
+    {
         $data = $this->vehicle->create($request);
-        if($data['code'] != '200') {
+        if ($data['code'] != '200') {
             return response()->json([
                 'success' => false,
                 'code' => $data['code'],
                 'error' => $data['message']
-            ], 200);
+            ]);
         }
         return response()->json([
             'success' => true,
             'code' => $data['code'],
             'data' => $data['data']
         ]);
-//        return $data;
     }
 
-    public function update($id, Request $request){
+    public function update($id, Request $request)
+    {
         $data = $this->vehicle->update($id, $request);
-//        return new VehicleResource($data);
+        if ($data['code'] != '200') {
+            return response()->json([
+                'success' => false,
+                'code' => $data['code'],
+                'error' => $data['message']
+            ]);
+        }
         return response()->json([
-            'data' => $data
-        ], 201);
+            'success' => true,
+            'code' => $data['code'],
+            'data' => $data['data']
+        ]);
     }
 
-    public function delete($id){
+    public function delete($id)
+    {
         $this->vehicle->delete($id);
         return response()->json([
             'message' => 'delete success'
-        ],200);
+        ], 200);
     }
 
-    public function search(Request $request){
+    public function search(Request $request)
+    {
         $result = $this->vehicle->search($request->all());
-        return  VehicleResource::collection($result);
+        return VehicleResource::collection($result);
 //      return response()->json([
 //            'data' => $result
 //        ], 200);
     }
 
-    public function findId($id){
+    public function findId($id)
+    {
         $data = Vehicle::findOrFail($id);
 //        $vehicle = VehicleResource::collection($data);
         return new VehicleResource($data);

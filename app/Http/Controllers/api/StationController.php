@@ -20,19 +20,35 @@ class StationController extends Controller
     public function create(Request $request)
     {
         $data = $this->stationServices->create($request);
-//        return new VehicleStationResource($data);
+        if ($data['code'] != '200') {
             return response()->json([
-                'data' => $data,
+                'success' => false,
+                'code' => $data['code'],
+                'error' => $data['message']
             ]);
+        }
+        return response()->json([
+            'success' => true,
+            'code' => $data['code'],
+            'data' => $data['data']
+        ]);
     }
 
     public function update($id, Request $request)
     {
         $data = $this->stationServices->update($id, $request);
-//        return new VehicleStationResource($data);
+        if ($data['code'] != '200') {
             return response()->json([
-                'data' => $data,
+                'success' => false,
+                'code' => $data['code'],
+                'error' => $data['message']
             ]);
+        }
+        return response()->json([
+            'success' => true,
+            'code' => $data['code'],
+            'data' => $data['data']
+        ]);
     }
 
     public function delete($id)
