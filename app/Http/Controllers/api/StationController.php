@@ -36,7 +36,7 @@ class StationController extends Controller
         if ($data['code'] != '200') {
             return $this->responseUtil->sendError($data['message'], $data['code']);
         }
-        return $this->responseUtil->sendResponse('Created', $data['data']);
+        return $this->responseUtil->sendResponse('Updated', $data['data']);
     }
 
     public function delete($id)

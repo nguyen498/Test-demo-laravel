@@ -8,7 +8,7 @@ class ResponseUtil
         return [
             'success' => true,
             'message' => $message,
-            '$data' => $data
+            'data' => $data
         ];
     }
 
