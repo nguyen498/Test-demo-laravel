@@ -28,62 +28,21 @@ class StationDetailService extends BaseService
         if ($checkInput['is_fail']) {
             return $checkInput;
         }
-
-        if (!empty($request->has('reference'))) {
-            $check = VehicleStationDetail::where('reference', $request->input('reference'))->first();
-            if ($check) {
-                return response()->json(
-                    [
-                        'message' => 'Reference is empty',
-                    ], 401
-                );
-            } else {
-                $stationDetail = $this->stationDetailRepository->create(new VehicleStationDetail(), $request->all());
-                $stationDetail->update([$stationDetail->reference = $request->input('reference')]);
+        $stationDetail = $this->stationDetailRepository->create(new VehicleStationDetail(), $request->all());
+        if ($request->file('cover_media')) {
+            $media = $this->saveCoverMedia($request);
+            if (isset($media)) {
+                $stationDetail->medias()->save($media);
             }
-        } else {
-            $stationDetail = $this->stationDetailRepository->create(new VehicleStationDetail(), $request->all());
-            $stationDetail->update([$stationDetail->reference = rand()]);
         }
-        if ($file = $request->file('cover_media')) {
-            $checkCoverMedia = $this->checkMedia($request->input('cover_media'), 1);
-            if ($checkCoverMedia['is_fail']) {
-                return $checkCoverMedia;
-            }
-            $request->cover_media->store('public/upload');
-
-            $name = rand() . '.' . $file->getClientOriginalName();
-            $file->move(public_path() . '/upload', $name);
-            $media = $this->mediaRepository->create(new Media(), [
-                'name' => $name,
-                'path' => '/upload/' . $name,
-                'type' => 1
-            ]);
-
-            $stationDetail->medias()->save($media);
-        }
-
         $data = [];
         if ($request->file('detail_media')) {
-            $checkDetailMedia = $this->checkMedia($request->input('detail_media'), 5);
-            if ($checkDetailMedia['is_fail']) {
-                return $checkDetailMedia;
-            }
-            foreach ($request->file('detail_media') as $key => $file) {
-                $name = rand() . '.' . $file->getClientOriginalName();
-                $file->move(public_path() . '/upload', $name);
-                $media = $this->mediaRepository->create(new Media(), [
-                    'name' => $name,
-                    'path' => '/upload/' . $name,
-                    'type' => 2
-                ]);
-                $stationDetail->medias()->save($media);
-                $data[$key] = $media;
-            }
+            $this->saveDetailMedia($request, $stationDetail, []);
         }
         return [
             'code' => '200',
-            'data' => $stationDetail
+            'data' => $stationDetail,
+            'medias' => $data
         ];
 
     }
@@ -93,19 +52,6 @@ class StationDetailService extends BaseService
         $checkInput = $this->checkInput($request->all());
         if ($checkInput['is_fail']) {
             return $checkInput;
-        }
-        if (!empty($request->has('reference'))) {
-            $check = VehicleStationDetail::where('reference', $request->input('reference'))->first();
-            if ($check) {
-                return response()->json(
-                    [
-                        'message' => 'Reference is empty',
-                    ], 401
-                );
-            } else {
-                $stationDetail = $this->stationDetailRepository->update(VehicleStationDetail::class, $id, $request->all());
-                $stationDetail->update([$stationDetail->reference = $request->input('reference')]);
-            }
         }
 
         $stationDetail = VehicleStationDetail::find($id);
@@ -175,9 +121,9 @@ class StationDetailService extends BaseService
         return $this->stationDetailRepository->search(new VehicleStationDetail(), $inputs);
     }
 
-    public function checkInput(array $inputs)
+    public function checkInput($request)
     {
-        $validate = Validator::make($inputs, [
+        $validate = Validator::make($request->all(), [
             'vehicle_station_id' => 'required ',
         ]);
         if ($validate->fails()) {
@@ -188,5 +134,18 @@ class StationDetailService extends BaseService
                 ], 401
             );
         }
+        if ($request->file('cover_media')) {
+            $checkCoverMedia = $this->checkMedia($request->input('cover_media'), 1);
+            if ($checkCoverMedia['is_fail']) {
+                return $checkCoverMedia;
+            }
+        }
+        if ($request->hasFile('detail_media')) {
+            $checkDetailMedia = $this->checkMedia($request->input('detail_media'), 5);
+            if ($checkDetailMedia['is_fail']) {
+                return $checkDetailMedia;
+            }
+        }
+
     }
 }

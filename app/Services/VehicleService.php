@@ -93,6 +93,7 @@ class VehicleService extends BaseService
             'code' => '200',
             'data' => [
                 'vehicle' => $vehicle,
+                'media' => $data
             ]
         ];
     }
